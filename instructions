@@ -1,0 +1,21 @@
+### Git CLI commands:
+
+# Clone the folder into the current folder:
+git clone https://github.com/deanzadok/Facial-Beauty-Prediction.git
+
+# enter the newly created folder:
+cd Facial-Beauty-Prediction/
+
+# if there are new changes from the last time you cloned, pull them:
+git pull origin master
+
+# if there are new files to upload to git, type this to add the new files to the commit:
+git add .
+
+# make commit, do this if there are new files or just new changes in files, change the commit message accordingly:
+git commit -a -m "commit message"
+
+# push your changes after you added new files and made the commit:
+git push origin master
+
+That's all.
