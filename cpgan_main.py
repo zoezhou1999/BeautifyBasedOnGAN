@@ -92,10 +92,15 @@ class PGGAN():
     def create_criterion(self):
         # w is for gan
         if self.opts['gan'] == 'lsgan':
+            ## the loss: the average square distance between prediction and target
             self.adv_criterion = lambda p,t,w: torch.mean((p-t)**2)  # sigmoid is applied here
         elif self.opts['gan'] == 'wgan_gp':
+            ## the loss: if target is true: the higher positive prediction will get a minimized loss
+            ##          if target is false: the lower the prediction will be, the minimized the loss will be
             self.adv_criterion = lambda p,t,w: (-2*t+1) * torch.mean(p)
         elif self.opts['gan'] == 'gan':
+            ## the loss: if target is true: the higher the prediction the lower the loss
+            ##          if target is false: the lower the prediction - the bigger the right log, and minimized loss
             self.adv_criterion = lambda p,t,w: -w*(torch.mean(t*torch.log(p+1e-8)) + torch.mean((1-t)*torch.log(1-p+1e-8)))
         else:
             raise ValueError('Invalid/Unsupported GAN: %s.' % self.opts['gan'])
@@ -103,6 +108,7 @@ class PGGAN():
     def compute_adv_loss(self, prediction, target, w):
         return self.adv_criterion(prediction, target, w)
 
+    ## currently no additional loss is added to both G and D
     def compute_additional_g_loss(self):
         return 0.0
 
@@ -113,6 +119,7 @@ class PGGAN():
         return d.data[0] if isinstance(d, Variable) else d
 
     def compute_G_loss(self):
+        ## loss is sent with True because G is better if creates images considered to be true.
         g_adv_loss = self.compute_adv_loss(self.d_fake, True, 1)
         g_add_loss = self.compute_additional_g_loss()
         self.g_adv_loss = self._get_data(g_adv_loss)
@@ -120,6 +127,7 @@ class PGGAN():
         return g_adv_loss + g_add_loss
 
     def compute_D_loss(self):
+        ## loss is weighted half by feeding real and half by feeding fake images
         self.d_adv_loss_real = self.compute_adv_loss(self.d_real, True, 0.5)
         self.d_adv_loss_fake = self.compute_adv_loss(self.d_fake, False, 0.5) * self.opts['fake_weight']
         d_adv_loss = self.d_adv_loss_real + self.d_adv_loss_fake
@@ -129,10 +137,11 @@ class PGGAN():
 
         return d_adv_loss + d_add_loss
 
+    # returns ascending weight for learning rate (function of epoch)
     def _rampup(self, epoch, rampup_length):
         if epoch < rampup_length:
             p = max(0.0, float(epoch)) / float(rampup_length)
-            p = 1.0 - p
+            p = 1.0 - p ## p is getting smaller when epoch is advancing
             return np.exp(-p*p*5.0)
         else:
             return 1.0
