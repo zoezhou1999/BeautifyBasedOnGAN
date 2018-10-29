@@ -14,7 +14,7 @@ import torchvision.utils as vutils
 from torch.autograd import Variable
 import os
 import numpy as np
-import models as models
+import models.dc_models as models
 import matplotlib as mpl
 mpl.use('Agg')
 import matplotlib.pyplot as plt

@@ -5,8 +5,6 @@ import torch.nn as nn
 import torch.nn.parallel
 import torchvision.models.vgg as vgg
 
-## commit test
-
 
 class DCGAN_D(nn.Module):
     def __init__(self, isize, nz, nc, ndf, ngpu, n_extra_layers=0):
