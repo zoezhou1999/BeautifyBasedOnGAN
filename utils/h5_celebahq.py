@@ -18,7 +18,6 @@ import numpy as np
 import scipy.ndimage
 import PIL.Image
 import h5py
-import cv2
 
 max_image_size = 256
 
