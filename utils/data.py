@@ -53,7 +53,7 @@ def get_img(img_path, is_crop=True, crop_h=256, resize_h=64, normalize=False):
 
 class CelebA():
     def __init__(self):
-        datapath = 'CelebA-HQ/celebahq.h5'
+        datapath = 'CelebA-HQ/celebahq_256.h5'
         resolution = ['data2x2', 'data4x4', 'data8x8', 'data16x16', 'data32x32', 'data64x64', \
                         'data128x128', 'data256x256', 'data512x512', 'data1024x1024']
         self._base_key = 'data'
