@@ -22,28 +22,26 @@ parser.add_argument('--batchSize', type=int, default=32, help='input batch size'
 parser.add_argument('--imageSize', type=int, default=224, help='the height / width of the input image to network')
 parser.add_argument('--niter', type=int, default=2, help='number of epochs to train for')
 parser.add_argument('--lr', type=float, default=1e-4, help='learning rate, default=1e-4')
-parser.add_argument('--cuda'  , action='store_true', help='enables cuda')
-parser.add_argument('--ngpu'  , type=int, default=1, help='number of GPUs to use')
 parser.add_argument('--experiment', default=None, help='Where to store samples and models')
 opt = parser.parse_args()
 print(opt)
 
+# use cuda if available, cpu if not
+device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 cudnn.benchmark = True
-
-if torch.cuda.is_available() and not opt.cuda:
-    print("WARNING: You have a CUDA device, so you should probably run with --cuda")
 
 # VGG-16 Takes 224x224 images as input
 transform=transforms.Compose([
                               transforms.RandomHorizontalFlip(),
-                              transforms.Resize(opt.imageSize),
-                              transforms.CenterCrop(opt.imageSize),
+                              transforms.RandomResizedCrop(opt.imageSize),
+                              # transforms.Resize(opt.imageSize),
+                              # transforms.CenterCrop(opt.imageSize),
                               transforms.ToTensor(),
                               transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
                               ])
 
 # load labeled beauty rates dataset
-data_dir = 'beauty_dataset_labeled'
+data_dir = 'datasets/Beauty_dataset'
 dataset = FacesDataset(data_dir, transform)
 
 # split dataset to 80% train, 20% validation
@@ -87,8 +85,12 @@ features.extend([nn.Linear(num_features, beauty_rates_number)]) # Add our layer 
 vgg16.classifier = nn.Sequential(*features) # Replace the model classifier
 
 # move model to gpu
-if opt.cuda:
-    vgg16.cuda()
+if torch.cuda.device_count() > 1:
+    print("Running on", torch.cuda.device_count(), "GPUs.")
+    vgg16 = nn.DataParallel(vgg16)
+else:
+    print("Running on CPU.")
+vgg16.to(device)
 
 # define loss and optimization
 criterion = nn.MSELoss()
@@ -127,7 +129,7 @@ def train_model(vgg, criterion, optimizer, num_epochs=10):
             images, beauty_rates, _ = data
             
             # move to gpu if available
-            if opt.cuda:
+            if torch.cuda.is_available():
                 images, beauty_rates = Variable(images.cuda()), Variable(beauty_rates.cuda())
             else:
                 images, beauty_rates = Variable(images), Variable(beauty_rates)
@@ -165,7 +167,7 @@ def train_model(vgg, criterion, optimizer, num_epochs=10):
             images, beauty_rates, _ = data
             
             # move to gpu if available
-            if opt.cuda:
+            if torch.cuda.is_available():
                 with torch.no_grad():
                     images, beauty_rates = Variable(images.cuda()), Variable(beauty_rates.cuda())
             else:
