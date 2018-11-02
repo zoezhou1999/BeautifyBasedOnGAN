@@ -43,7 +43,7 @@ class WScaleLayer(nn.Module):
             self.incoming.bias = None
 
     def forward(self, x):
-        x = self.scale * x
+        x = self.scale * x.cuda()
         if self.bias is not None:
             x += self.bias.view(1, self.bias.size()[0], 1, 1)
         return x
