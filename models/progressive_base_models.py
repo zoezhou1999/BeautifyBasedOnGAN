@@ -43,7 +43,9 @@ class WScaleLayer(nn.Module):
             self.incoming.bias = None
 
     def forward(self, x):
-        x = self.scale * x.cuda()
+        # print("is cuda x: {}".format(x.is_cuda))
+        # print("is cuda self.scale: {}".format(self.scale.is_cuda))
+        x = self.scale.cuda() * x ## added conversion to cuda
         if self.bias is not None:
             x += self.bias.view(1, self.bias.size()[0], 1, 1)
         return x
@@ -135,14 +137,23 @@ class GDropLayer(nn.Module):
         if self.mode == 'drop':
             p = 1 - self.strength
             rnd = np.random.binomial(1, p=p, size=rnd_shape) / p
+            #print(" rnd.type() drop: {}".format(rnd.type()))
         elif self.mode == 'mul':
             rnd = (1 + self.strength) ** np.random.normal(size=rnd_shape)
+            #print(" rnd.type() mul: {}".format(rnd.type()))
         else:
             coef = self.strength * x.size(1) ** 0.5
-            rnd = np.random.normal(size=rnd_shape) * coef + 1
+            coef_np = coef.numpy()
+            # rnd = np.random.normal(size=rnd_shape) * coef + 1
+            rnd = np.random.normal(size=rnd_shape) * coef_np + 1
+            #print("coef is: {} and coef.type() else: {}".format(coef, coef.type()))
+            #print("rnd is: {} rnd.type() else: {}".format(rnd,rnd.type()))
 
         if self.normalize:
             rnd = rnd / np.linalg.norm(rnd, keepdims=True)
+        #print("x.data.type(): {}".format(x.data.type()))
+        # print("torch.from_numpy(rnd) type() before conversion: {}".format(torch.from_numpy(rnd).type()))
+        # print("rnd.type2(): {}".format(rnd.type()))
         rnd = Variable(torch.from_numpy(rnd).type(x.data.type()))
         if x.is_cuda:
             rnd = rnd.cuda()
