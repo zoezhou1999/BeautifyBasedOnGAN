@@ -15,7 +15,6 @@ beauty_rates_number = 60
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--imageSize', type=int, default=224, help='the height / width of the input image to network')
-parser.add_argument('--niter', type=int, default=2, help='number of epochs to train for')
 opt = parser.parse_args()
 print(opt)
 
@@ -53,7 +52,7 @@ features.extend([nn.Linear(num_features, 60)]) # Add our layer with 5 outputs
 vgg16.classifier = nn.Sequential(*features) # Replace the model classifier
 
 # upload pretrained weights from beauty labeled dataset
-folder = 'experiments/train_beauty_classifier_02/'
+folder = 'experiments/train_beauty_classifier_03/'
 file = 'VGG16_beauty_rates.pt'
 vgg16.load_state_dict(torch.load(folder + file))
 vgg16.eval()
@@ -65,14 +64,19 @@ vgg16.to(device)
 beauty_rates = []
 number_of_images = len(dataset['data256x256'])
 
-
 for i, img in enumerate(dataset['data256x256']):
 
-    # TODO: check if img does contains a PIL image and not np array
-    # img = np.array(img, dtype=np.float32)
-    # img = Image.fromarray(img)
+    # convert np array to PIL image 
+    img = np.moveaxis(img, 0, 2)
+    img = Image.fromarray(img)
+    
+    # save some images if needed
+    # if i < 20:
+    #     img.save('{}.png'.format(i))
+        
+    # resize and normalize image
     img = transform(img)
-
+    
     img = torch.from_numpy(np.asarray(img))
     if torch.cuda.is_available():
         with torch.no_grad():

@@ -14,15 +14,12 @@ beauty_rates_number = 60
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--imageSize', type=int, default=224, help='the height / width of the input image to network')
-parser.add_argument('--niter', type=int, default=2, help='number of epochs to train for')
-parser.add_argument('--cuda'  , action='store_true', help='enables cuda')
 opt = parser.parse_args()
 print(opt)
 
+# define cuda as device if available
+device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 cudnn.benchmark = True
-
-if torch.cuda.is_available() and not opt.cuda:
-    print("WARNING: You have a CUDA device, so you should probably run with --cuda")
 
 # VGG-16 Takes 224x224 images as input
 transform=transforms.Compose([
@@ -46,21 +43,19 @@ features.extend([nn.Linear(num_features, 60)]) # Add our layer with 5 outputs
 vgg16.classifier = nn.Sequential(*features) # Replace the model classifier
 
 # upload pretrained weights from beauty labeled dataset
-folder = 'beauty_rates_prediction_v2/'
+folder = 'experiments/train_beauty_classifier_03/'
 file = 'VGG16_beauty_rates.pt'
 vgg16.load_state_dict(torch.load(folder + file))
 vgg16.eval()
 
-# move model to gpu
-if opt.cuda:
-    vgg16.cuda()
-
+# move model to gpu if available
+vgg16.to(device)
 
 # open image, transform and upload to gpu
-img = Image.open("img4.jpeg")
+img = Image.open("1.jpg")
 img = transform(img)
 img = torch.from_numpy(np.asarray(img))
-if opt.cuda:
+if torch.cuda.is_available():
     with torch.no_grad():
         img = Variable(img.cuda())
 else:
