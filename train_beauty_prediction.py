@@ -27,7 +27,7 @@ opt = parser.parse_args()
 print(opt)
 
 # use cuda if available, cpu if not
-device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+device = torch.device("cuda:1" if torch.cuda.is_available() else "cpu")
 cudnn.benchmark = True
 
 # VGG-16 Takes 224x224 images as input
@@ -36,6 +36,7 @@ transform=transforms.Compose([
                               transforms.RandomResizedCrop(opt.imageSize),
                               # transforms.Resize(opt.imageSize),
                               # transforms.CenterCrop(opt.imageSize),
+                              transforms.RandomRotation(10),
                               transforms.ToTensor(),
                               transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
                               ])
@@ -85,11 +86,13 @@ features.extend([nn.Linear(num_features, beauty_rates_number)]) # Add our layer 
 vgg16.classifier = nn.Sequential(*features) # Replace the model classifier
 
 # check if several GPUs exist and move model to gpu if available
+"""
 if torch.cuda.device_count() > 1:
     print("Running on", torch.cuda.device_count(), "GPUs.")
     vgg16 = nn.DataParallel(vgg16)
 else:
     print("Running on CPU.")
+"""
 vgg16.to(device)
 
 # define loss and optimization
@@ -130,7 +133,7 @@ def train_model(vgg, criterion, optimizer, num_epochs=10):
             
             # move to gpu if available
             if torch.cuda.is_available():
-                images, beauty_rates = Variable(images.cuda()), Variable(beauty_rates.cuda())
+                images, beauty_rates = Variable(images.to(device)), Variable(beauty_rates.to(device))
             else:
                 images, beauty_rates = Variable(images), Variable(beauty_rates)
             
@@ -169,7 +172,7 @@ def train_model(vgg, criterion, optimizer, num_epochs=10):
             # move to gpu if available
             if torch.cuda.is_available():
                 with torch.no_grad():
-                    images, beauty_rates = Variable(images.cuda()), Variable(beauty_rates.cuda())
+                    images, beauty_rates = Variable(images.to(device)), Variable(beauty_rates.to(device))
             else:
                 with torch.no_grad():
                     images, beauty_rates = Variable(images), Variable(beauty_rates)
