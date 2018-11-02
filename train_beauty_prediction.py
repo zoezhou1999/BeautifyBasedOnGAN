@@ -22,16 +22,14 @@ parser.add_argument('--batchSize', type=int, default=32, help='input batch size'
 parser.add_argument('--imageSize', type=int, default=224, help='the height / width of the input image to network')
 parser.add_argument('--niter', type=int, default=2, help='number of epochs to train for')
 parser.add_argument('--lr', type=float, default=1e-4, help='learning rate, default=1e-4')
-parser.add_argument('--cuda'  , action='store_true', help='enables cuda')
-parser.add_argument('--ngpu'  , type=int, default=1, help='number of GPUs to use')
 parser.add_argument('--experiment', default=None, help='Where to store samples and models')
 opt = parser.parse_args()
 print(opt)
 
 cudnn.benchmark = True
 
-if torch.cuda.is_available() and not opt.cuda:
-    print("WARNING: You have a CUDA device, so you should probably run with --cuda")
+# define cuda as device if available
+device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 # VGG-16 Takes 224x224 images as input
 transform=transforms.Compose([
@@ -43,7 +41,7 @@ transform=transforms.Compose([
                               ])
 
 # load labeled beauty rates dataset
-data_dir = 'beauty_dataset_labeled'
+data_dir = 'datasets/Beauty_dataset'
 dataset = FacesDataset(data_dir, transform)
 
 # split dataset to 80% train, 20% validation
@@ -83,12 +81,17 @@ for param in vgg16.features.parameters():
 # Newly created modules have require_grad=True by default
 num_features = vgg16.classifier[6].in_features
 features = list(vgg16.classifier.children())[:-1] # Remove last layer
-features.extend([nn.Linear(num_features, beauty_rates_number)]) # Add our layer with 5 outputs
+features.extend([nn.Linear(num_features, beauty_rates_number)]) # Add our layer with 60 outputs
 vgg16.classifier = nn.Sequential(*features) # Replace the model classifier
 
+# check if several GPUs exist
+if torch.cuda.device_count() > 1:
+    print("Let's use", torch.cuda.device_count(), "GPUs!")
+    # dim = 0 [30, xxx] -> [10, ...], [10, ...], [10, ...] on 3 GPUs
+    vgg16 = nn.DataParallel(vgg16)
+
 # move model to gpu
-if opt.cuda:
-    vgg16.cuda()
+vgg16.to(device)
 
 # define loss and optimization
 criterion = nn.MSELoss()
