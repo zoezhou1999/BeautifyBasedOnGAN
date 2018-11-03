@@ -127,9 +127,10 @@ class PGGAN():
         strength = 0.2 * max(0, self._d_ - 0.5)**2
         return strength
 
-    def preprocess(self, z, real):
+    def preprocess(self, z, real, ranking):
         self.z = self._numpy2var(z)
         self.real = self._numpy2var(real)
+        self.ranking = self._numpy2var(ranking)
 
     def forward_G(self, cur_level):
         self.d_fake = self.D(self.fake, cur_level=cur_level)
@@ -184,12 +185,12 @@ class PGGAN():
                 cur_resol = 2 ** int(np.ceil(cur_level+1))
                 phase = 'stabilize' if int(cur_level) == cur_level else 'fade_in'
 
-                # get a batch noise and real images
+                # get a batch noise, real images and related beauty ratings
                 z = self.noise(batch_size)
-                x = self.data(batch_size, cur_resol)
+                x, ranking = self.data(batch_size, cur_resol)
 
                 # preprocess
-                self.preprocess(z, x)
+                self.preprocess(z, x, ranking)
 
                 # update D
                 self.optim_D.zero_grad()

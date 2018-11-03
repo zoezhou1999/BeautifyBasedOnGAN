@@ -103,7 +103,7 @@ for i, img in enumerate(dataset['data256x256']):
 csv_lines = []
 for i in range(0, beauty_rates_number):
     for j in range(0, number_of_images):
-        csv_lines.append('{0},{1},'.format(str(i+1), str(beauty_rates[j][i]*5.0)))
+        csv_lines.append('{0},{1},{2}'.format(i+1, j+1, beauty_rates[j][i]*5.0))
 
 # write csv lines to file
 csv_path = "{0}/All_Ratings.csv".format(dataset_folder)

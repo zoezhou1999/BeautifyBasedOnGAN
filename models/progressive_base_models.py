@@ -37,7 +37,7 @@ class WScaleLayer(nn.Module):
             self.incoming.bias = None
 
     def forward(self, x):
-        x = self.scale * x
+        x = self.scale.cuda() * x
         if self.bias is not None:
             x += self.bias.view(1, self.bias.size()[0], 1, 1)
         return x
@@ -71,7 +71,7 @@ class MinibatchStatConcatLayer(nn.Module):
         vals = self.adjusted_std(x, dim=0, keepdim=True)
         if self.averaging == 'all':
             target_shape[1] = 1
-            vals = torch.mean(vals, keepdim=True)
+            vals = torch.mean(vals, dim=1, keepdim=True)
         elif self.averaging == 'spatial':
             if len(shape) == 4:
                 vals = mean(vals, axis=[2,3], keepdim=True)  # torch.mean(torch.mean(vals, 2, keepdim=True), 3, keepdim=True)
@@ -126,7 +126,8 @@ class GDropLayer(nn.Module):
             rnd = (1 + self.strength) ** np.random.normal(size=rnd_shape)
         else:
             coef = self.strength * x.size(1) ** 0.5
-            rnd = np.random.normal(size=rnd_shape) * coef + 1
+            coef_np = coef.cpu().numpy()
+            rnd = np.random.normal(size=rnd_shape) * coef_np + 1
 
         if self.normalize:
             rnd = rnd / np.linalg.norm(rnd, keepdims=True)
