@@ -20,7 +20,7 @@ class PixelNormLayer(nn.Module):
     
     def forward(self, x):
         return x / (torch.mean(x**2, dim=1, keepdim=True) + 1e-8) ** 0.5
-    
+
     def __repr__(self):
         return self.__class__.__name__ + '(eps = %s)' % (self.eps)
 
@@ -36,15 +36,15 @@ class WScaleLayer(nn.Module):
             self.bias = self.incoming.bias
             self.incoming.bias = None
 
-def forward(self, x):
-    x = self.scale * x
+    def forward(self, x):
+        x = self.scale * x
         if self.bias is not None:
             x += self.bias.view(1, self.bias.size()[0], 1, 1)
-    return x
+        return x
 
-def __repr__(self):
-    param_str = '(incoming = %s)' % (self.incoming.__class__.__name__)
-    return self.__class__.__name__ + param_str
+    def __repr__(self):
+        param_str = '(incoming = %s)' % (self.incoming.__class__.__name__)
+        return self.__class__.__name__ + param_str
 
 
 def mean(tensor, axis, **kwargs):
@@ -64,7 +64,7 @@ class MinibatchStatConcatLayer(nn.Module):
         else:
             assert self.averaging in ['all', 'flat', 'spatial', 'none', 'gpool'], 'Invalid averaging mode'%self.averaging
         self.adjusted_std = lambda x, **kwargs: torch.sqrt(torch.mean((x - torch.mean(x, **kwargs)) ** 2, **kwargs) + 1e-8)
-    
+
     def forward(self, x):
         shape = list(x.size())
         target_shape = shape.copy()
@@ -89,7 +89,7 @@ class MinibatchStatConcatLayer(nn.Module):
             vals = mean(vals, axis=0, keepdim=True).view(1, self.n, 1, 1)
         vals = vals.expand(*target_shape)
         return torch.cat([x, vals], 1)
-    
+
     def __repr__(self):
         return self.__class__.__name__ + '(averaging = %s)' % (self.averaging)
 
@@ -98,7 +98,7 @@ class MinibatchDiscriminationLayer(nn.Module):
     def __init__(self, num_kernels):
         super(MinibatchDiscriminationLayer, self).__init__()
         self.num_kernels = num_kernels
-    
+
     def forward(self, x):
         pass
 
@@ -113,11 +113,11 @@ class GDropLayer(nn.Module):
         self.axes = [axes] if isinstance(axes, int) else list(axes)
         self.normalize = normalize
         self.gain = None
-    
+
     def forward(self, x, deterministic=False):
         if deterministic or not self.strength:
             return x
-        
+
         rnd_shape = [s if axis in self.axes else 1 for axis, s in enumerate(x.size())]  # [x.size(axis) for axis in self.axes]
         if self.mode == 'drop':
             p = 1 - self.strength
@@ -127,14 +127,14 @@ class GDropLayer(nn.Module):
         else:
             coef = self.strength * x.size(1) ** 0.5
             rnd = np.random.normal(size=rnd_shape) * coef + 1
-        
+
         if self.normalize:
             rnd = rnd / np.linalg.norm(rnd, keepdims=True)
         rnd = Variable(torch.from_numpy(rnd).type(x.data.type()))
         if x.is_cuda:
             rnd = rnd.cuda()
         return x * rnd
-    
+
     def __repr__(self):
         param_str = '(mode = %s, strength = %s, axes = %s, normalize = %s)' % (self.mode, self.strength, self.axes, self.normalize)
         return self.__class__.__name__ + param_str
@@ -147,39 +147,39 @@ class LayerNormLayer(nn.Module):
         self.eps = eps
         self.gain = Parameter(torch.FloatTensor([1.0]), requires_grad=True)
         self.bias = None
-        
+
         if self.incoming.bias is not None:
             self.bias = self.incoming.bias
             self.incoming.bias = None
 
-def forward(self, x):
-    x = x - mean(x, axis=range(1, len(x.size())))
-    x = x * torch.inverse(torch.sqrt(mean(x**2, axis=range(1, len(x.size())), keepdim=True) + self.eps))
-    x = x * self.gain
+    def forward(self, x):
+        x = x - mean(x, axis=range(1, len(x.size())))
+        x = x * torch.inverse(torch.sqrt(mean(x**2, axis=range(1, len(x.size())), keepdim=True) + self.eps))
+        x = x * self.gain
         if self.bias is not None:
             x += self.bias
-    return x
+        return x
 
-def __repr__(self):
-    param_str = '(incoming = %s, eps = %s)' % (self.incoming.__class__.__name__, self.eps)
-    return self.__class__.__name__ + param_str
+    def __repr__(self):
+        param_str = '(incoming = %s, eps = %s)' % (self.incoming.__class__.__name__, self.eps)
+        return self.__class__.__name__ + param_str
 
 
 def resize_activations(v, so):
     si = list(v.size())
     so = list(so)
     assert len(si) == len(so) and si[0] == so[0]
-    
+
     # Decrease feature maps.
     if si[1] > so[1]:
         v = v[:, :so[1]]
-    
+
     # Shrink spatial axes.
     if len(si) == 4 and (si[2] > so[2] or si[3] > so[3]):
         assert si[2] % so[2] == 0 and si[3] % so[3] == 0
         ks = (si[2] // so[2], si[3] // so[3])
         v = F.avg_pool2d(v, kernel_size=ks, stride=ks, ceil_mode=False, padding=0, count_include_pad=False)
-    
+
     # Extend spatial axes.
     shape = [1, 1]
     for i in range(2, len(si)):
@@ -190,10 +190,10 @@ def resize_activations(v, so):
             shape += [1]
     v = v.repeat(*shape)
 
-# Increase feature maps.
-if si[1] < so[1]:
-    z = torch.zeros((v.shape[0], so[1] - si[1]) + so[2:])
-    v = torch.cat([v, z], 1)
+    # Increase feature maps.
+    if si[1] < so[1]:
+        z = torch.zeros((v.shape[0], so[1] - si[1]) + so[2:])
+        v = torch.cat([v, z], 1)
     return v
 
 
@@ -205,21 +205,21 @@ class GSelectLayer(nn.Module):
         self.chain = chain
         self.post = post
         self.N = len(self.chain)
-    
+
     def forward(self, x, y=None, cur_level=None, insert_y_at=None):
         if cur_level is None:
             cur_level = self.N  # cur_level: physical index
         if y is not None:
             assert insert_y_at is not None
-        
+
         min_level, max_level = int(np.floor(cur_level-1)), int(np.ceil(cur_level-1))
         min_level_weight, max_level_weight = int(cur_level+1)-cur_level, cur_level-int(cur_level)
         
         _from, _to, _step = 0, max_level+1, 1
-        
+
         if self.pre is not None:
             x = self.pre(x)
-        
+
         out = {}
         if DEBUG:
             print('G: level=%s, size=%s' % ('in', x.size()))
@@ -228,19 +228,19 @@ class GSelectLayer(nn.Module):
                 x = self.chain[level](x, y)
             else:
                 x = self.chain[level](x)
-            
+
             if DEBUG:
                 print('G: level=%d, size=%s' % (level, x.size()))
-            
+
             if level == min_level:
                 out['min_level'] = self.post[level](x)
             if level == max_level:
                 out['max_level'] = self.post[level](x)
                 x = resize_activations(out['min_level'], out['max_level'].size()) * min_level_weight + \
-                    out['max_level'] * max_level_weight
-            if DEBUG:
-                        print('G:', x.size())
-                            return x
+                        out['max_level'] * max_level_weight
+        if DEBUG:
+            print('G:', x.size())
+        return x
 
 
 class DSelectLayer(nn.Module):
@@ -251,24 +251,24 @@ class DSelectLayer(nn.Module):
         self.chain = chain
         self.inputs = inputs
         self.N = len(self.chain)
-    
+
     def forward(self, x, y=None, cur_level=None, insert_y_at=None):
         if cur_level is None:
             cur_level = self.N  # cur_level: physical index
         if y is not None:
             assert insert_y_at is not None
-        
+
         max_level, min_level = int(np.floor(self.N-cur_level)), int(np.ceil(self.N-cur_level))
         min_level_weight, max_level_weight = int(cur_level+1)-cur_level, cur_level-int(cur_level)
         
         _from, _to, _step = min_level+1, self.N, 1
-        
+
         if self.pre is not None:
             x = self.pre(x)
-        
+
         if DEBUG:
             print('D: level=%s, size=%s, max_level=%s, min_level=%s' % ('in', x.size(), max_level, min_level))
-        
+
         if max_level == min_level:
             x = self.inputs[max_level](x)
             if max_level == insert_y_at:
@@ -285,27 +285,27 @@ class DSelectLayer(nn.Module):
             out['max_level'] = tmp
             out['min_level'] = self.inputs[min_level](x)
             x = resize_activations(out['min_level'], out['max_level'].size()) * min_level_weight + \
-                out['max_level'] * max_level_weight
+                                out['max_level'] * max_level_weight
             if min_level == insert_y_at:
                 x = self.chain[min_level](x, y)
-else:
-    x = self.chain[min_level](x)
-        
+            else:
+                x = self.chain[min_level](x)
+
         for level in range(_from, _to, _step):
             if level == insert_y_at:
                 x = self.chain[level](x, y)
             else:
                 x = self.chain[level](x)
-            
+
             if DEBUG:
                 print('D: level=%d, size=%s' % (level, x.size()))
-    return x
+        return x
 
 
 class ConcatLayer(nn.Module):
     def __init__(self):
         super(ConcatLayer, self).__init__()
-    
+
     def forward(self, x, y):
         return torch.cat([x, y], 1)
 
@@ -314,7 +314,7 @@ class ReshapeLayer(nn.Module):
     def __init__(self, new_shape):
         super(ReshapeLayer, self).__init__()
         self.new_shape = new_shape  # not include minibatch dimension
-    
+
     def forward(self, x):
         assert reduce(lambda u,v: u*v, self.new_shape) == reduce(lambda u,v: u*v, x.size()[1:])
         return x.view(-1, *self.new_shape)
@@ -333,3 +333,4 @@ def he_init(layer, nonlinearity='conv2d', param=None):
     else:
         gain = calculate_gain(nonlinearity)
     kaiming_normal(layer.weight, a=gain)
+
