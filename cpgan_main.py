@@ -24,6 +24,10 @@ class PGGAN():
         self.logger = Logger('./logs/' + self.current_time + "/")
         gpu = self.opts['gpu']
         self.use_cuda = len(gpu) > 0
+        if self.use_cuda:
+            print("self.use cuda is 1")
+        else:
+            print("self.use cuda is 0")
         os.environ['CUDA_VISIBLE_DEVICES'] = gpu
 
         self.bs_map = {2**R: self.get_bs(2**R) for R in range(2, 11)} # batch size map keyed by resolution_level
@@ -82,9 +86,11 @@ class PGGAN():
 
     def register_on_gpu(self):
         if self.use_cuda:
+            print("using cuda print added by nir")
             self.G.cuda()
             self.D.cuda()
-
+        else:
+            print("not using cuda print added by nir")
     def create_optimizer(self):
         self.optim_G = optim.Adam(self.G.parameters(), lr=self.opts['g_lr_max'], betas=(self.opts['beta1'], self.opts['beta2']))
         self.optim_D = optim.Adam(self.D.parameters(), lr=self.opts['d_lr_max'], betas=(self.opts['beta1'], self.opts['beta2']))
