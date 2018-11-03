@@ -229,9 +229,11 @@ class PGGAN():
         n_col = int(np.ceil(batch_size / float(n_row)))
         white_space = np.ones((self.real.size(1), self.real.size(2), 3))
         samples = []
+        samples_real = []
         i = j = 0
         for row in range(n_row):
             one_row = []
+            one_row_real = []
             # fake
             for col in range(n_col):
                 one_row.append(self.fake[i].cpu().data.numpy())
@@ -241,14 +243,18 @@ class PGGAN():
             # real
             for col in range(n_col):
                 one_row.append(self.real[j].cpu().data.numpy())
+                one_row_real.append(self.real[j].cpu().data.numpy())
                 if col < n_col-1:
                     one_row.append(white_space)
                 j += 1
             samples += [np.concatenate(one_row, axis=2)]
-        ### save_only_real - debug output becoming black ###
-        imsave(file_name + "_only_real", samples)
+            samples_real += [np.concatenate(one_row_real, axis=2)]
+
         samples = np.concatenate(samples, axis=1).transpose([1, 2, 0])
+        samples_real = np.concatenate(samples_real, axis=1).transpose([1, 2, 0])
         imsave(file_name, samples)
+        ### save_only_real - debug output becoming black ###
+        imsave(file_name + "_samples_real", samples_real)
 
     def save(self, file_name):
         g_file = file_name + '-G.pth'
