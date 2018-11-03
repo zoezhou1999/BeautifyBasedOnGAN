@@ -134,12 +134,20 @@ class PGGAN():
 
     def forward_G(self, cur_level):
         self.d_fake = self.D(self.fake, cur_level=cur_level)
-    
+        # using conditioning
+        # self.d_fake = self.D(self.fake, self.ranking, cur_level=cur_level)
+
     def forward_D(self, cur_level, detach=True):
         self.fake = self.G(self.z, cur_level=cur_level)
+        # using conditioning
+        # self.fake = self.G(self.z, self.ranking, cur_level=cur_level)
         strength = self.compute_noise_strength()
         self.d_real = self.D(self.real, cur_level=cur_level, gdrop_strength=strength)
         self.d_fake = self.D(self.fake.detach() if detach else self.fake, cur_level=cur_level)
+        # using conditioning
+        # self.d_real = self.D(self.real, self.ranking, cur_level=cur_level, gdrop_strength=strength)
+        # self.d_fake = self.D(self.fake.detach() if detach else self.fake, self.ranking, cur_level=cur_level)
+    
         # print('d_real', self.d_real.view(-1))
         # print('d_fake', self.d_fake.view(-1))
         # print(self.fake[0].view(-1))
@@ -156,9 +164,9 @@ class PGGAN():
         self.optim_D.step()
         self.d_loss = self._get_data(d_loss)
 
-    def report(self, it, num_it, phase):
-        formation = 'Iter[%d|%d], %s, G: %.3f, D: %.3f, G_adv: %.3f, G_add: %.3f, D_adv: %.3f, D_add: %.3f'
-        values = (it, num_it, phase, self.g_loss, self.d_loss, self.g_adv_loss, self.g_add_loss, self.d_adv_loss, self.d_add_loss)
+    def report(self, it, num_it, phase, cur_level):
+        formation = 'Iter[%d|%d], %s, level: %d, G: %.3f, D: %.3f, G_adv: %.3f, G_add: %.3f, D_adv: %.3f, D_add: %.3f'
+        values = (it, num_it, phase, cur_level, self.g_loss, self.d_loss, self.g_adv_loss, self.g_add_loss, self.d_adv_loss, self.d_add_loss)
         print(formation % values)
 
     def train(self):
@@ -203,7 +211,7 @@ class PGGAN():
                 self.backward_G()
 
                 # report 
-                self.report(it, _num_it, phase)
+                self.report(it, _num_it, phase, cur_level)
                 
                 cur_nimg += batch_size
 
