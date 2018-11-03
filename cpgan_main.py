@@ -255,7 +255,7 @@ class PGGAN():
         samples_real = np.concatenate(samples_real, axis=1).transpose([1, 2, 0])
         imsave(file_name, samples)
         ### save_only_real - debug output becoming black ###
-        imsave(file_name + "_samples_real", samples_real)
+        imsave("samples_real_" + file_name , samples_real)
 
     def save(self, file_name):
         g_file = file_name + '-G.pth'
