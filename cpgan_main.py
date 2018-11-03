@@ -246,7 +246,7 @@ class PGGAN():
                 j += 1
             samples += [np.concatenate(one_row, axis=2)]
             ### save_only_real - debug output becoming black ###
-            imsave(file_name + "_only_real", samples)
+        imsave(file_name + "_only_real", samples)
         samples = np.concatenate(samples, axis=1).transpose([1, 2, 0])
         imsave(file_name, samples)
 
