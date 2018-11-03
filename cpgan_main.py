@@ -246,6 +246,7 @@ class PGGAN():
                 one_row_real.append(self.real[j].cpu().data.numpy())
                 if col < n_col-1:
                     one_row.append(white_space)
+                    one_row_real.append(white_space)
                 j += 1
             samples += [np.concatenate(one_row, axis=2)]
             samples_real += [np.concatenate(one_row_real, axis=2)]
