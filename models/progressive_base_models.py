@@ -145,7 +145,12 @@ class GDropLayer(nn.Module):
             coef = self.strength * x.size(1) ** 0.5
             coef_np = coef.numpy()
             # rnd = np.random.normal(size=rnd_shape) * coef + 1
-            rnd = np.random.normal(size=rnd_shape) * coef_np + 1
+            rnd_b = np.random.normal(size=rnd_shape)
+            #print("rnd_b : {}".format(rnd_b[0][0]))
+            #print("coef : {}".format(coef.data[0]))
+            rnd = rnd_b * coef_np + 1
+            #print("rnd : {}".format(rnd[0][0]))
+            #print("rnd size: {}".format(rnd.size))
             #print("coef is: {} and coef.type() else: {}".format(coef, coef.type()))
             #print("rnd is: {} rnd.type() else: {}".format(rnd,rnd.type()))
 
