@@ -12,6 +12,8 @@ if sys.version_info.major == 3:
 
 DEBUG = False
 
+device = torch.device("cuda:1" if torch.cuda.is_available() else "cpu")
+
 
 class PixelNormLayer(nn.Module):
     def __init__(self, eps=1e-8):
@@ -37,9 +39,9 @@ class WScaleLayer(nn.Module):
             self.incoming.bias = None
 
     def forward(self, x):
-        x = self.scale.cuda() * x
+        x = self.scale.to(device) * x.to(device)
         if self.bias is not None:
-            x += self.bias.view(1, self.bias.size()[0], 1, 1)
+            x += self.bias.view(1, self.bias.size()[0], 1, 1).to(device)
         return x
 
     def __repr__(self):
@@ -133,7 +135,7 @@ class GDropLayer(nn.Module):
             rnd = rnd / np.linalg.norm(rnd, keepdims=True)
         rnd = Variable(torch.from_numpy(rnd).type(x.data.type()))
         if x.is_cuda:
-            rnd = rnd.cuda()
+            rnd = rnd.to(device)
         return x * rnd
 
     def __repr__(self):

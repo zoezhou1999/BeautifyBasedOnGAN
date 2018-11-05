@@ -2,6 +2,7 @@
 import torch
 import torch.optim as optim
 from torch.autograd import Variable
+import torch.nn as nn
 import sys, os, time
 sys.path.append('utils')
 sys.path.append('models')
@@ -19,10 +20,19 @@ class PGGAN():
         self.data = data
         self.noise = noise
         self.opts = opts
-
-        gpu = self.opts['gpu']
-        self.use_cuda = len(gpu) > 0
-        os.environ['CUDA_VISIBLE_DEVICES'] = gpu
+        
+        # GPU number 0 will be used as default if available, otherwise we'll use cpu
+        self.device = torch.device("cuda:1" if torch.cuda.is_available() else "cpu")
+        
+        # use data parallel if more than one GPU is available
+        #if torch.cuda.device_count() > 1:
+        #    print("The train session will use", torch.cuda.device_count(), "GPUs")
+        #    self.G = nn.DataParallel(self.G)
+        #    self.D = nn.DataParallel(self.D)
+        
+        # move models to selected device
+        self.G.to(self.device)
+        self.D.to(self.device)
 
         current_time = time.strftime('%Y-%m-%d %H%M%S')
         self.opts['sample_dir'] = os.path.join(os.path.join(self.opts['exp_dir'], current_time), 'samples')
@@ -46,11 +56,6 @@ class PGGAN():
         else:
             bs = 8 / 2**(min(2, R-7))
         return int(bs)
-
-    def registe_on_gpu(self):
-        if self.use_cuda:
-            self.G.cuda()
-            self.D.cuda()
 
     def create_optimizer(self):
         self.optim_G = optim.Adam(self.G.parameters(), lr=self.opts['lr'], betas=(self.opts['beta1'], self.opts['beta2']))
@@ -98,9 +103,7 @@ class PGGAN():
         pass
 
     def _numpy2var(self, x):
-        var =  Variable(torch.from_numpy(x))
-        if self.use_cuda:
-            var = var.cuda()
+        var = Variable(torch.from_numpy(x)).to(self.device)
         return var
 
     def add_noise(self, x):
@@ -173,7 +176,6 @@ class PGGAN():
         # prepare
         self.create_optimizer()
         self.create_criterion()
-        self.registe_on_gpu()
 
         to_level = int(np.log2(self.opts['target_resol']))
         from_level = int(np.log2(self.opts['first_resol']))
@@ -265,7 +267,6 @@ class PGGAN():
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--gpu', default='', type=str, help='gpu(s) to use.')
     parser.add_argument('--train_kimg', default=600, type=float, help='# * 1000 real samples for each stabilizing training phase.')
     parser.add_argument('--transition_kimg', default=600, type=float, help='# * 1000 real samples for each fading in phase.')
     parser.add_argument('--lr', default=1e-3, type=float, help='learning rate')
