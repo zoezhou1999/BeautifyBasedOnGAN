@@ -6,7 +6,7 @@ import torch.nn as nn
 import sys, os, time
 sys.path.append('utils')
 sys.path.append('models')
-from data import CelebA, RandomNoiseGenerator
+from data import CelebA, CelebAHQ, RandomNoiseGenerator
 from models.progressive_models import Generator, Discriminator
 import argparse
 import numpy as np
@@ -298,7 +298,7 @@ if __name__ == '__main__':
     D = Discriminator(num_channels=3, resolution=args.target_resol, fmap_max=512, fmap_base=8192, sigmoid_at_end=sigmoid_at_end)
     print(G)
     print(D)
-    data = CelebA()
+    data = CelebAHQ()
     noise = RandomNoiseGenerator(latent_size, 'gaussian')
     pggan = PGGAN(G, D, data, noise, opts)
     pggan.train()

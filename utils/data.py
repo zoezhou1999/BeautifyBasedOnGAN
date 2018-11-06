@@ -84,7 +84,8 @@ class CelebAHQ():
                 min_lw, max_lw = int(level+1)-level, level-int(level)
                 lr_key = self._base_key + '{}x{}'.format(size//2, size//2)
                 low_resol_batch_x = np.array([self.dataset[lr_key][i]/127.5-1.0 for i in idx], dtype=np.float32).repeat(2, axis=2).repeat(2, axis=3)
-            # batch_x = batch_x * max_lw + low_resol_batch_x * min_lw
+            batch_x_merged = batch_x * max_lw + low_resol_batch_x * min_lw
+            print("batch x size: {}. merged batch size: {}".format(batch_x.size(), batch_x_merged.size()))
         
         # print("image index: {}".format(idx[0]))
         # print("beauty rates: {}".format(list(batch_ranking[0])))
