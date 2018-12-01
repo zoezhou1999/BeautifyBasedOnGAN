@@ -14,7 +14,6 @@ beauty_rates_number = 60
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--imageSize', type=int, default=224, help='the height / width of the input image to network')
-parser.add_argument('--niter', type=int, default=2, help='number of epochs to train for')
 parser.add_argument('--cuda'  , action='store_true', help='enables cuda')
 opt = parser.parse_args()
 print(opt)
@@ -27,7 +26,7 @@ if torch.cuda.is_available() and not opt.cuda:
 # VGG-16 Takes 224x224 images as input
 transform=transforms.Compose([
                               #transforms.Pad((50,0)),
-                              transforms.CenterCrop(178),
+                              #transforms.CenterCrop(178),
                               transforms.Resize(opt.imageSize),
                               transforms.ToTensor(),
                               transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
@@ -47,7 +46,7 @@ features.extend([nn.Linear(num_features, 60)]) # Add our layer with 5 outputs
 vgg16.classifier = nn.Sequential(*features) # Replace the model classifier
 
 # upload pretrained weights from beauty labeled dataset
-folder = 'beauty_rates_prediction_v2/'
+folder = 'experiments/train_beauty_classifier_02/'
 file = 'VGG16_beauty_rates.pt'
 vgg16.load_state_dict(torch.load(folder + file))
 vgg16.eval()
@@ -59,8 +58,8 @@ if opt.cuda:
 # create beauty rates lists for each image in dataset
 files = []
 beauty_rates = []
-dataset_folder = "celebA_aligned"
-dataset_path = "{0}/Images".format(dataset_folder)
+dataset_folder = "../datasets/400faces"
+dataset_path = "{0}/img".format(dataset_folder)
 number_of_images = len(os.listdir(dataset_path))
 
 for i, file in enumerate(sorted(os.listdir(dataset_path))):

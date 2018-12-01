@@ -42,7 +42,7 @@ transform=transforms.Compose([
                               ])
 
 # load labeled beauty rates dataset
-data_dir = 'datasets/Beauty_dataset'
+data_dir = '../datasets/beauty_dataset'
 dataset = FacesDataset(data_dir, transform)
 
 # split dataset to 80% train, 20% validation

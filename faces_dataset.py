@@ -27,7 +27,7 @@ class FacesDataset(Dataset):
         dataset_dict = {}
         
         # read raters csv file
-        with open('./' + folder_dataset + '/All_Ratings.csv', 'r') as csvfile:
+        with open(folder_dataset + '/All_Ratings.csv', 'r') as csvfile:
 
             raw_dataset = csv.reader(csvfile, delimiter=',', quotechar='|')
             for i, row in enumerate(raw_dataset):
@@ -42,7 +42,7 @@ class FacesDataset(Dataset):
 
         # move dict to lists, convert beauty rates to numpy ranged in [0,1]
         for key, value in dataset_dict.iteritems():
-            self.images.append('./' + folder_dataset + '/Images/' + key)
+            self.images.append(folder_dataset + '/img/beauty_dataset/' + key)
             self.beauty_rates.append((np.asarray(value, dtype=np.float32) / 5.0))
         #print("beauty rates size: ")
         #print(len(self.beauty_rates))
