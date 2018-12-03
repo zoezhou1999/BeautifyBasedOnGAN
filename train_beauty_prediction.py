@@ -27,7 +27,7 @@ opt = parser.parse_args()
 print(opt)
 
 # use cuda if available, cpu if not
-device = torch.device("cuda:1" if torch.cuda.is_available() else "cpu")
+device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 cudnn.benchmark = True
 
 # VGG-16 Takes 224x224 images as input
