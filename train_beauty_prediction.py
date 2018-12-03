@@ -18,9 +18,9 @@ beauty_rates_number = 60
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--workers', type=int, help='number of data loading workers', default=2)
-parser.add_argument('--batchSize', type=int, default=32, help='input batch size')
+parser.add_argument('--batchSize', type=int, default=64, help='input batch size')
 parser.add_argument('--imageSize', type=int, default=224, help='the height / width of the input image to network')
-parser.add_argument('--niter', type=int, default=2, help='number of epochs to train for')
+parser.add_argument('--niter', type=int, default=10, help='number of epochs to train for')
 parser.add_argument('--lr', type=float, default=1e-4, help='learning rate, default=1e-4')
 parser.add_argument('--experiment', default=None, help='Where to store samples and models')
 opt = parser.parse_args()
@@ -86,13 +86,11 @@ features.extend([nn.Linear(num_features, beauty_rates_number)]) # Add our layer 
 vgg16.classifier = nn.Sequential(*features) # Replace the model classifier
 
 # check if several GPUs exist and move model to gpu if available
-"""
 if torch.cuda.device_count() > 1:
     print("Running on", torch.cuda.device_count(), "GPUs.")
     vgg16 = nn.DataParallel(vgg16)
 else:
     print("Running on CPU.")
-"""
 vgg16.to(device)
 
 # define loss and optimization

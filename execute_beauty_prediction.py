@@ -14,18 +14,15 @@ beauty_rates_number = 60
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--imageSize', type=int, default=224, help='the height / width of the input image to network')
-parser.add_argument('--cuda'  , action='store_true', help='enables cuda')
 opt = parser.parse_args()
 print(opt)
 
+device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 cudnn.benchmark = True
-
-if torch.cuda.is_available() and not opt.cuda:
-    print("WARNING: You have a CUDA device, so you should probably run with --cuda")
 
 # VGG-16 Takes 224x224 images as input
 transform=transforms.Compose([
-                              #transforms.Pad((50,0)),
+                              transforms.Pad((50,0)),
                               #transforms.CenterCrop(178),
                               transforms.Resize(opt.imageSize),
                               transforms.ToTensor(),
@@ -45,15 +42,19 @@ features = list(vgg16.classifier.children())[:-1] # Remove last layer
 features.extend([nn.Linear(num_features, 60)]) # Add our layer with 5 outputs
 vgg16.classifier = nn.Sequential(*features) # Replace the model classifier
 
+# move model to gpu
+if torch.cuda.device_count() > 1:
+    print("Running on", torch.cuda.device_count(), "GPUs.")
+    vgg16 = nn.DataParallel(vgg16)
+else:
+    print("Running on CPU.")
+vgg16.to(device)
+
 # upload pretrained weights from beauty labeled dataset
-folder = 'experiments/train_beauty_classifier_02/'
+folder = 'experiments/train_beauty_classifier_03/'
 file = 'VGG16_beauty_rates.pt'
 vgg16.load_state_dict(torch.load(folder + file))
 vgg16.eval()
-
-# move model to gpu
-if opt.cuda:
-    vgg16.cuda()
 
 # create beauty rates lists for each image in dataset
 files = []
@@ -68,7 +69,7 @@ for i, file in enumerate(sorted(os.listdir(dataset_path))):
     img = Image.open(os.path.join(dataset_path,file))
     img = transform(img)
     img = torch.from_numpy(np.asarray(img))
-    if opt.cuda:
+    if torch.cuda.is_available():
         with torch.no_grad():
             img = Variable(img.cuda())
     else:
