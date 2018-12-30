@@ -13,8 +13,10 @@ import matplotlib.pyplot as plt
 from faces_dataset import FacesDataset
 from torch.utils.data.sampler import SubsetRandomSampler
 import copy
+import torch.nn.functional as F
 
-beauty_rates_number = 60
+
+beauty_rates_number = 10
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--workers', type=int, help='number of data loading workers', default=2)
@@ -28,7 +30,7 @@ opt = parser.parse_args()
 print(opt)
 
 # use cuda if available, cpu if not
-device = torch.device("cuda:1" if torch.cuda.is_available() else "cpu")
+device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 cudnn.benchmark = True
 
 # VGG-16 Takes 224x224 images as input
@@ -83,7 +85,7 @@ for param in vgg16.features.parameters():
 # Newly created modules have require_grad=True by default
 num_features = vgg16.classifier[6].in_features
 features = list(vgg16.classifier.children())[:-1] # Remove last layer
-features.extend([nn.Linear(num_features, beauty_rates_number)]) # Add our layer with 60 outputs
+features.extend([nn.Linear(num_features, beauty_rates_number)]) # Add our layer with 60 outputs and activation on it
 vgg16.classifier = nn.Sequential(*features) # Replace the model classifier
 
 # check if several GPUs exist and move model to gpu if available
@@ -95,7 +97,7 @@ else:
 vgg16.to(device)
 
 # define loss and optimization
-criterion = nn.MSELoss()
+criterion = nn.CrossEntropyLoss()
 optimizer = torch.optim.Adam(vgg16.parameters(), lr=opt.lr)
 
 # function to train the model
@@ -128,20 +130,19 @@ def train_model(vgg, criterion, optimizer, num_epochs=10):
                 print("\rTraining batch {}/{}".format(i, train_batches))
 
             # get images and labels from data loader
-            images, beauty_rates, _ = data
+            images, beauty_rates, beauty_class = data
             
             # move to gpu if available
             if torch.cuda.is_available():
-                images, beauty_rates = Variable(images.to(device)), Variable(beauty_rates.to(device))
+                images, beauty_class = Variable(images.to(device)), Variable(beauty_class.to(device))
             else:
-                images, beauty_rates = Variable(images), Variable(beauty_rates)
+                images, beauty_class = Variable(images), Variable(beauty_class)
             
             optimizer.zero_grad()
 
             # infer images and compute loss
             outputs = vgg(images)
-            outputs = torch.unsqueeze(outputs,1)
-            loss = criterion(outputs, beauty_rates)
+            loss = criterion(outputs, beauty_class.long())
             
             loss.backward()
             optimizer.step()
@@ -150,7 +151,7 @@ def train_model(vgg, criterion, optimizer, num_epochs=10):
             loss_train += loss.data[0]
 
             # free memory
-            del images, beauty_rates, outputs
+            del images, beauty_class, beauty_rates, outputs
             torch.cuda.empty_cache()
     
         print()
@@ -166,28 +167,27 @@ def train_model(vgg, criterion, optimizer, num_epochs=10):
                 print("\rValidation batch {}/{}".format(i, val_batches))
             
             # get images and labels from data loader
-            images, beauty_rates, _ = data
+            images, beauty_rates, beauty_class = data
             
             # move to gpu if available
             if torch.cuda.is_available():
                 with torch.no_grad():
-                    images, beauty_rates = Variable(images.to(device)), Variable(beauty_rates.to(device))
+                    images, beauty_class = Variable(images.to(device)), Variable(beauty_class.to(device))
             else:
                 with torch.no_grad():
-                    images, beauty_rates = Variable(images), Variable(beauty_rates)
+                    images, beauty_class = Variable(images), Variable(beauty_class)
             
             optimizer.zero_grad()
 
             # infer images and compute loss
             outputs = vgg(images)
-            outputs = torch.unsqueeze(outputs,1)
-            loss = criterion(outputs, beauty_rates)
+            loss = criterion(outputs, beauty_class.long())
 
             # sum batches losses
             loss_val += loss.data[0]
 
             # free memory
-            del images, beauty_rates, outputs
+            del images, beauty_rates, beauty_class, outputs
             torch.cuda.empty_cache()
 
         avg_loss_val = loss_val / (len(dataset)*validation_split)

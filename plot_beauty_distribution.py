@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 
 # initialize parser arguments
 parser = argparse.ArgumentParser()
-parser.add_argument('--csv', '-csv', help='path to csv file', default='./All_Ratings.csv', type=str)
+parser.add_argument('--csv', '-csv', help='path to csv file', default='../All_Ratings.csv', type=str)
 parser.add_argument('--density', '-density', help='configure plot density', default=0.05, type=float)
 args = parser.parse_args()
 

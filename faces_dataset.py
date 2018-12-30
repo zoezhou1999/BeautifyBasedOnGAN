@@ -60,27 +60,27 @@ class FacesDataset(Dataset):
         # Convert image and beauty rates to torch tensors
         img = torch.from_numpy(np.asarray(img))
         features = torch.from_numpy(np.asarray(self.beauty_rates[index]).reshape([1,raters_number]))
-        # print("shape of features: ")
-        # print(features.shape())
-        Beauty_level = np.asarray(self.beauty_rates[index]).reshape([1,raters_number]).mean()
-
+        
+        # compute class for beauty rates in [1,10]
+        features_class = (torch.mean(features)* 10.0).int()
+        
         #return img, features, Is_Beauty
-        return img, features, Beauty_level
-
+        return img, features, features_class
+    
     # Override to give PyTorch size of dataset
     def __len__(self):
         return len(self.images)
 
 if __name__ == "__main__":
     
-    train_dataset = FacesDataset('beauty_dataset_labeled')
+    train_dataset = FacesDataset('../datasets/beauty_dataset')
 
     # sample one image and beauty rates to test correlation
-    image, features, Beauty_level = train_dataset.__getitem__(4)
+    image, features, features_class = train_dataset.__getitem__(5)
     
     print("beauty rates: "+ str(features))
     print("beauty rate mean: "+ str(features.mean()))
-    print("Beauty_level : " + str(Beauty_level))
+    print("beauty rate class: "+ str(features_class))
     
     # display image (wont work on ssh)
     # plt.imshow(image)
