@@ -16,7 +16,7 @@ import copy
 import torch.nn.functional as F
 
 
-beauty_rates_number = 10
+beauty_rates_number = 60
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--workers', type=int, help='number of data loading workers', default=2)
@@ -97,7 +97,7 @@ else:
 vgg16.to(device)
 
 # define loss and optimization
-criterion = nn.CrossEntropyLoss()
+criterion = nn.MSELoss()
 optimizer = torch.optim.Adam(vgg16.parameters(), lr=opt.lr)
 
 # function to train the model
@@ -134,15 +134,16 @@ def train_model(vgg, criterion, optimizer, num_epochs=10):
             
             # move to gpu if available
             if torch.cuda.is_available():
-                images, beauty_class = Variable(images.to(device)), Variable(beauty_class.to(device))
+                images, beauty_rates = Variable(images.to(device)), Variable(beauty_rates.to(device))
             else:
-                images, beauty_class = Variable(images), Variable(beauty_class)
+                images, beauty_rates = Variable(images), Variable(beauty_rates)
             
             optimizer.zero_grad()
 
             # infer images and compute loss
             outputs = vgg(images)
-            loss = criterion(outputs, beauty_class.long())
+            beauty_rates = torch.squeeze(beauty_rates, 1)
+            loss = criterion(outputs, beauty_rates)
             
             loss.backward()
             optimizer.step()
@@ -172,16 +173,17 @@ def train_model(vgg, criterion, optimizer, num_epochs=10):
             # move to gpu if available
             if torch.cuda.is_available():
                 with torch.no_grad():
-                    images, beauty_class = Variable(images.to(device)), Variable(beauty_class.to(device))
+                    images, beauty_rates = Variable(images.to(device)), Variable(beauty_rates.to(device))
             else:
                 with torch.no_grad():
-                    images, beauty_class = Variable(images), Variable(beauty_class)
+                    images, beauty_rates = Variable(images), Variable(beauty_rates)
             
             optimizer.zero_grad()
 
             # infer images and compute loss
             outputs = vgg(images)
-            loss = criterion(outputs, beauty_class.long())
+            beauty_rates = torch.squeeze(beauty_rates, 1)
+            loss = criterion(outputs, beauty_rates)
 
             # sum batches losses
             loss_val += loss.data[0]

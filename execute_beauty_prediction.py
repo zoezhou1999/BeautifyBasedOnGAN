@@ -22,7 +22,7 @@ cudnn.benchmark = True
 
 # VGG-16 Takes 224x224 images as input
 transform=transforms.Compose([
-                              transforms.Pad((50,0)),
+                              #transforms.Pad((50,0)),
                               #transforms.CenterCrop(178),
                               transforms.Resize(opt.imageSize),
                               transforms.ToTensor(),
@@ -51,7 +51,7 @@ else:
 vgg16.to(device)
 
 # upload pretrained weights from beauty labeled dataset
-folder = 'experiments/train_beauty_classifier_03/'
+folder = 'experiments/train_beauty_vgg_bestsofar/'
 file = 'VGG16_beauty_rates.pt'
 vgg16.load_state_dict(torch.load(folder + file))
 vgg16.eval()
@@ -59,7 +59,7 @@ vgg16.eval()
 # create beauty rates lists for each image in dataset
 files = []
 beauty_rates = []
-dataset_folder = "../datasets/400faces"
+dataset_folder = "../datasets/CelebA-HQ"
 dataset_path = "{0}/img".format(dataset_folder)
 number_of_images = len(os.listdir(dataset_path))
 
