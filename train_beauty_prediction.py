@@ -15,19 +15,20 @@ from torch.utils.data.sampler import SubsetRandomSampler
 import copy
 import torch.nn.functional as F
 
-
-beauty_rates_number = 60
-
 parser = argparse.ArgumentParser()
 parser.add_argument('--workers', type=int, help='number of data loading workers', default=2)
 parser.add_argument('--batchSize', type=int, default=64, help='input batch size')
 parser.add_argument('--imageSize', type=int, default=224, help='the height / width of the input image to network')
+parser.add_argument('--beauty_rates', type=int, default=60, help='number of beauty rates/output neurons for the last layer')
 parser.add_argument('--niter', type=int, default=10, help='number of epochs to train for')
 parser.add_argument('--lr', type=float, default=1e-4, help='learning rate, default=1e-4')
 parser.add_argument('--experiment', default=None, help='Where to store samples and models')
-parser.add_argument('--parallel', dest='parallel', action='store_true')
 opt = parser.parse_args()
 print(opt)
+
+# create experiments directory
+if not os.path.exists(opt.experiment):
+    os.makedirs(opt.experiment)
 
 # use cuda if available, cpu if not
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
@@ -36,7 +37,6 @@ cudnn.benchmark = True
 # VGG-16 Takes 224x224 images as input
 transform=transforms.Compose([
                               transforms.RandomHorizontalFlip(),
-                              #transforms.RandomResizedCrop(opt.imageSize),
                               transforms.Resize(opt.imageSize),
                               transforms.CenterCrop(opt.imageSize),
                               transforms.RandomRotation(10),
@@ -85,11 +85,11 @@ for param in vgg16.features.parameters():
 # Newly created modules have require_grad=True by default
 num_features = vgg16.classifier[6].in_features
 features = list(vgg16.classifier.children())[:-1] # Remove last layer
-features.extend([nn.Linear(num_features, beauty_rates_number)]) # Add our layer with 60 outputs and activation on it
+features.extend([nn.Linear(num_features, opt.beauty_rates)]) # Add our layer with opt.beauty_rates outputs and activation on it
 vgg16.classifier = nn.Sequential(*features) # Replace the model classifier
 
 # check if several GPUs exist and move model to gpu if available
-if opt.parallel and torch.cuda.device_count() > 1:
+if torch.cuda.device_count() > 1:
     print("Running on", torch.cuda.device_count(), "GPUs.")
     vgg16 = nn.DataParallel(vgg16)
 else:

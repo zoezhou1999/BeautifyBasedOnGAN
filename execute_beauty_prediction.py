@@ -10,10 +10,12 @@ import numpy as np
 from PIL import Image
 import csv
 
-beauty_rates_number = 60
-
 parser = argparse.ArgumentParser()
-parser.add_argument('--imageSize', type=int, default=224, help='the height / width of the input image to network')
+parser.add_argument('--model', type=str, default='experiments/train_beauty_vgg/VGG16_beauty_rates.pt', help='path to the trained VGG16 model')
+parser.add_argument('--dataset', type=str, default='../datasets/CelebA-HQ', help='path to the dataset we want to label')
+parser.add_argument('--beauty_rates', type=int, default=60, help='number of beauty rates/output neurons for the last layer')
+parser.add_argument('--pad_x', type=int, default=0, help='pixels to pad the given images from left and right')
+parser.add_argument('--pad_y', type=int, default=0, help='pixels to pad the given images from up and down')
 opt = parser.parse_args()
 print(opt)
 
@@ -22,16 +24,14 @@ cudnn.benchmark = True
 
 # VGG-16 Takes 224x224 images as input
 transform=transforms.Compose([
-                              #transforms.Pad((50,0)),
-                              #transforms.CenterCrop(178),
-                              transforms.Resize(opt.imageSize),
+                              transforms.Pad((opt.pad_x,opt.pad_y)),
+                              transforms.Resize(224),
                               transforms.ToTensor(),
                               transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
                               ])
 
 # Load the pretrained model from pytorch
 vgg16 = models.vgg16_bn(pretrained=True)
-#print(vgg16.classifier[6].out_features) # 1000
 
 # Freeze training for all layers
 for param in vgg16.features.parameters():
@@ -39,7 +39,7 @@ for param in vgg16.features.parameters():
 # Newly created modules have require_grad=True by default
 num_features = vgg16.classifier[6].in_features
 features = list(vgg16.classifier.children())[:-1] # Remove last layer
-features.extend([nn.Linear(num_features, 60)]) # Add our layer with 5 outputs
+features.extend([nn.Linear(num_features, opt.beauty_rates)]) # Add our layer with opt.beauty_rates outputs
 vgg16.classifier = nn.Sequential(*features) # Replace the model classifier
 
 # move model to gpu
@@ -51,22 +51,19 @@ else:
 vgg16.to(device)
 
 # upload pretrained weights from beauty labeled dataset
-folder = 'experiments/train_beauty_vgg_bestsofar/'
-file = 'VGG16_beauty_rates.pt'
-vgg16.load_state_dict(torch.load(folder + file))
+vgg16.load_state_dict(torch.load(opt.model))
 vgg16.eval()
 
 # create beauty rates lists for each image in dataset
 files = []
 beauty_rates = []
-dataset_folder = "../datasets/CelebA-HQ"
-dataset_path = "{0}/img".format(dataset_folder)
-number_of_images = len(os.listdir(dataset_path))
+images_dir = "{0}/img".format(opt.dataset)
+number_of_images = len(os.listdir(images_dir))
 
-for i, file in enumerate(sorted(os.listdir(dataset_path))):
+for i, file in enumerate(sorted(os.listdir(images_dir))):
 
     # open image, transform and upload to gpu
-    img = Image.open(os.path.join(dataset_path,file))
+    img = Image.open(os.path.join(images_dir,file))
     img = transform(img)
     img = torch.from_numpy(np.asarray(img))
     if torch.cuda.is_available():
@@ -93,12 +90,12 @@ for i, file in enumerate(sorted(os.listdir(dataset_path))):
 
 # convert lists to csv lines
 csv_lines = []
-for i in range(0,beauty_rates_number):
+for i in range(0,opt.beauty_rates):
     for j in range(0,number_of_images):
         csv_lines.append('{0},{1},{2},'.format(str(i+1),files[j],str(beauty_rates[j][i]*5.0)))
 
 # write csv lines to file
-csv_path = "{0}/All_Ratings.csv".format(dataset_folder)
+csv_path = "{0}/All_Ratings.csv".format(opt.dataset)
 with open(csv_path, "wb") as csv_file:
     for line in csv_lines:
         csv_file.write(line)

@@ -10,11 +10,12 @@ import numpy as np
 from PIL import Image
 import csv
 
-beauty_rates_number = 60
-
 parser = argparse.ArgumentParser()
-parser.add_argument('--imageSize', type=int, default=224, help='the height / width of the input image to network')
-parser.add_argument('--parallel', dest='parallel', action='store_true')
+parser.add_argument('--model', type=str, default='experiments/train_beauty_vgg/VGG16_beauty_rates.pt', help='path to the trained VGG16 model')
+parser.add_argument('--image', type=str, default='sample1.png', help='path to the trained VGG16 model')
+parser.add_argument('--beauty_rates', type=int, default=60, help='number of beauty rates/output neurons for the last layer')
+parser.add_argument('--pad_x', type=int, default=0, help='pixels to pad the given images from left and right')
+parser.add_argument('--pad_y', type=int, default=0, help='pixels to pad the given images from up and down')
 opt = parser.parse_args()
 print(opt)
 
@@ -24,8 +25,9 @@ cudnn.benchmark = True
 
 # VGG-16 Takes 224x224 images as input
 transform=transforms.Compose([
-                              transforms.Resize(opt.imageSize),
-                              transforms.CenterCrop(opt.imageSize),
+                              transforms.Pad((opt.pad_x,opt.pad_y)),
+                              transforms.Resize(224),
+                              transforms.CenterCrop(224),
                               transforms.ToTensor(),
                               transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
                               ])
@@ -40,11 +42,11 @@ for param in vgg16.features.parameters():
 # Newly created modules have require_grad=True by default
 num_features = vgg16.classifier[6].in_features
 features = list(vgg16.classifier.children())[:-1] # Remove last layer
-features.extend([nn.Linear(num_features, 60)]) # Add our layer with 5 outputs
+features.extend([nn.Linear(num_features, opt.beauty_rates)]) # Add our layer with opt.beauty_rates outputs
 vgg16.classifier = nn.Sequential(*features) # Replace the model classifier
 
 # check if several GPUs exist and move model to gpu if available
-if opt.parallel and torch.cuda.device_count() > 1:
+if torch.cuda.device_count() > 1:
     print("Running on", torch.cuda.device_count(), "GPUs.")
     vgg16 = nn.DataParallel(vgg16)
 else:
@@ -52,13 +54,11 @@ else:
 vgg16.to(device)
 
 # upload pretrained weights from beauty labeled dataset
-folder = 'experiments/train_beauty_vgg_bestsofar/'
-file = 'VGG16_beauty_rates.pt'
-vgg16.load_state_dict(torch.load(folder + file))
+vgg16.load_state_dict(torch.load(opt.model))
 vgg16.eval()
 
 # open image, transform and upload to gpu
-img = Image.open("sample1.png")
+img = Image.open(opt.image)
 img = transform(img)
 img = torch.from_numpy(np.asarray(img))
 if torch.cuda.is_available():
