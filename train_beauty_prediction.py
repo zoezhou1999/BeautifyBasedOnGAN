@@ -1,5 +1,6 @@
 from __future__ import print_function, division
 import argparse
+import os
 import torch
 import torch.nn as nn
 import torch.backends.cudnn as cudnn
@@ -13,12 +14,10 @@ import matplotlib.pyplot as plt
 from faces_dataset import FacesDataset
 from torch.utils.data.sampler import SubsetRandomSampler
 import copy
-import torch.nn.functional as F
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--workers', type=int, help='number of data loading workers', default=2)
-parser.add_argument('--batchSize', type=int, default=64, help='input batch size')
-parser.add_argument('--imageSize', type=int, default=224, help='the height / width of the input image to network')
+parser.add_argument('--batchSize', type=int, default=32, help='input batch size')
 parser.add_argument('--beauty_rates', type=int, default=60, help='number of beauty rates/output neurons for the last layer')
 parser.add_argument('--niter', type=int, default=10, help='number of epochs to train for')
 parser.add_argument('--lr', type=float, default=1e-4, help='learning rate, default=1e-4')
@@ -37,8 +36,8 @@ cudnn.benchmark = True
 # VGG-16 Takes 224x224 images as input
 transform=transforms.Compose([
                               transforms.RandomHorizontalFlip(),
-                              transforms.Resize(opt.imageSize),
-                              transforms.CenterCrop(opt.imageSize),
+                              transforms.Resize(224),
+                              transforms.CenterCrop(224),
                               transforms.RandomRotation(10),
                               transforms.ToTensor(),
                               transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))

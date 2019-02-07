@@ -41,7 +41,7 @@ class FacesDataset(Dataset):
                     dataset_dict[row[1]] = [[float(row[2])]]
 
         # move dict to lists, convert beauty rates to numpy ranged in [0,1]
-        for key, value in dataset_dict.iteritems():
+        for key, value in dataset_dict.items():
             self.images.append(folder_dataset + '/img/beauty_dataset/' + key)
             self.beauty_rates.append((np.asarray(value, dtype=np.float32) / 5.0))
 

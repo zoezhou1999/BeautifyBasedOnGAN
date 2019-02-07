@@ -12,7 +12,7 @@ import csv
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--model', type=str, default='experiments/train_beauty_vgg/VGG16_beauty_rates.pt', help='path to the trained VGG16 model')
-parser.add_argument('--image', type=str, default='sample1.png', help='path to the trained VGG16 model')
+parser.add_argument('--image', type=str, default='sample.png', help='path to the trained VGG16 model')
 parser.add_argument('--beauty_rates', type=int, default=60, help='number of beauty rates/output neurons for the last layer')
 parser.add_argument('--pad_x', type=int, default=0, help='pixels to pad the given images from left and right')
 parser.add_argument('--pad_y', type=int, default=0, help='pixels to pad the given images from up and down')
