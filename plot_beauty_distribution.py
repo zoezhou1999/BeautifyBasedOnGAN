@@ -53,5 +53,4 @@ plt.ylabel('number of subjects')
 plt.title('Beauty Rates Distribution')
 plt.grid(True)
 plt.savefig(os.path.basename(args.csv).split(".")[-2]+ ".png")
-#plt.show()
 

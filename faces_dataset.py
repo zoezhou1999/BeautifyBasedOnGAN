@@ -44,8 +44,6 @@ class FacesDataset(Dataset):
         for key, value in dataset_dict.iteritems():
             self.images.append(folder_dataset + '/img/beauty_dataset/' + key)
             self.beauty_rates.append((np.asarray(value, dtype=np.float32) / 5.0))
-        #print("beauty rates size: ")
-        #print(len(self.beauty_rates))
 
     # Override to give PyTorch access to any image on the dataset
     def __getitem__(self, index):
@@ -81,7 +79,3 @@ if __name__ == "__main__":
     print("beauty rates: "+ str(features))
     print("beauty rate mean: "+ str(features.mean()))
     print("beauty rate class: "+ str(features_class))
-    
-    # display image (wont work on ssh)
-    # plt.imshow(image)
-    # plt.show()
