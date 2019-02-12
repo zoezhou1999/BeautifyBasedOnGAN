@@ -16,6 +16,7 @@ from torch.utils.data.sampler import SubsetRandomSampler
 import copy
 
 parser = argparse.ArgumentParser()
+parser.add_argument('--dataset', default=None, help='Where to load the dataset from')
 parser.add_argument('--workers', type=int, help='number of data loading workers', default=2)
 parser.add_argument('--batchSize', type=int, default=32, help='input batch size')
 parser.add_argument('--beauty_rates', type=int, default=60, help='number of beauty rates/output neurons for the last layer')
@@ -44,8 +45,7 @@ transform=transforms.Compose([
                               ])
 
 # load labeled beauty rates dataset
-data_dir = '../datasets/beauty_dataset'
-dataset = FacesDataset(data_dir, transform)
+dataset = FacesDataset(opt.dataset, transform)
 
 # split dataset to 80% train, 20% validation
 train_split = .8

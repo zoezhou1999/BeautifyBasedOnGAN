@@ -42,7 +42,7 @@ class FacesDataset(Dataset):
 
         # move dict to lists, convert beauty rates to numpy ranged in [0,1]
         for key, value in dataset_dict.items():
-            self.images.append(folder_dataset + '/img/beauty_dataset/' + key)
+            self.images.append(folder_dataset + '/img/' + key)
             self.beauty_rates.append((np.asarray(value, dtype=np.float32) / 5.0))
 
     # Override to give PyTorch access to any image on the dataset

@@ -15,7 +15,7 @@ import matplotlib.pyplot as plt
 # initialize parser arguments
 parser = argparse.ArgumentParser()
 parser.add_argument('--results_dir', '-results_dir', help='name of training experiment folder', default='dean_cond_batch16', type=str)
-parser.add_argument('--labels_size', '-labels_size', help='size of labels vector', default=10, type=int)
+parser.add_argument('--labels_size', '-labels_size', help='size of labels vector', default=60, type=int)
 parser.add_argument('--iters', '-iters', help='learning rate of algorithm', default=100000, type=int)
 parser.add_argument('--lr', '-lr', help='learning rate of algorithm', default=0.1, type=float)
 parser.add_argument('--alpha', '-alpha', help='weight of normal loss in relation to vgg loss', default=0.7, type=float)
