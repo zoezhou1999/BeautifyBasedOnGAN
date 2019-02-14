@@ -1166,7 +1166,7 @@ def execute_cmdline(argv):
     p.add_argument(     'delta_dir',        help='Directory containing CelebA-HQ deltas')
     p.add_argument(     '--num_threads',    help='Number of concurrent threads (default: 4)', type=int, default=4)
     p.add_argument(     '--num_tasks',      help='Number of concurrent processing tasks (default: 100)', type=int, default=100)
-    p.add_argument(     '--save_images',    help='Save CelebA-HQ images if requested (default: False)', type=bool, default=False)
+    p.add_argument(     '--save_images',    help='Save CelebA-HQ images if requested (default: False)', action='store_true')
 
     p = add_command(    'create_celebahq_cond_continuous',  'Create dataset for CelebA-HQ with continuous conditioning.',
                         'create_celebahq_cond datasets/celebahq ~/downloads/celeba ~/downloads/celeba-hq-deltas')
@@ -1175,7 +1175,7 @@ def execute_cmdline(argv):
     p.add_argument(     'delta_dir',        help='Directory containing CelebA-HQ deltas')
     p.add_argument(     '--num_threads',    help='Number of concurrent threads (default: 4)', type=int, default=4)
     p.add_argument(     '--num_tasks',      help='Number of concurrent processing tasks (default: 100)', type=int, default=100)
-    p.add_argument(     '--save_images',    help='Save CelebA-HQ images if requested (default: False)', type=bool, default=False)
+    p.add_argument(     '--save_images',    help='Save CelebA-HQ images if requested (default: False)', action='store_true')
 
     p = add_command(    'create_from_images', 'Create dataset from a directory full of images.',
                                             'create_from_images datasets/mydataset myimagedir')
