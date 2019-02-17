@@ -5,8 +5,8 @@ This is the code repository for our paper: [https://arxiv.org/abs/1902.02593](ht
 ![samples](docs/samples.png)  
 *Generated faces. left to right - least attractive to most attractive.*  
   
-Our generating procedure is heavily based on the implementation of progressive growing of GANs and our additions to the code, including generation and beautification, can be found here:  
-[https://github.com/beholdergan/progressive_growing_of_gans](https://github.com/beholdergan/progressive_growing_of_gans)  
+Our generating procedure is heavily based on the implementation of progressive growing of GANs. For more information, please refer to the original implementation:  
+[https://github.com/tkarras/progressive_growing_of_gans](https://github.com/tkarras/progressive_growing_of_gans)  
   
   
 ## Installation  
@@ -76,9 +76,12 @@ usage: dataset_tool.py [-h] <command> ...
 
 Type "dataset_tool.py <command> -h" for more information.
 ```
-These functions require the dataset folders to have the same structure mentioned before. The output will be tfrecord files ready for training session.  
-For more details on how to reconstruct the data and execute the training procedure, please refer to our version of Progressive Growing of GANs:  
-[https://github.com/beholdergan/progressive_growing_of_gans](https://github.com/beholdergan/progressive_growing_of_gans)  
+These functions require the dataset folders to have the same structure mentioned before. The output will be tfrecord files ready for training. The functions of CelebA-HQ allow saving the reconstructed images using the save_images flag.  
+Be advised that we offer two possible ways to prepare beauty labels - the first one is a one hot vector that represnts the class of the beauty levels mean for each image, and continuous is raw input without any computation on it.  
+In case of failure related to the version of pillow or libjpeg during reconstruction of CelebA-HQ dataset, please create the same virtual environment we suggest with Python 3.5 instead of 3.6.  
+  
+For more details on how to reconstruct the data and execute the training procedure, please refer to the original version of Progressive Growing of GANs:  
+[https://github.com/tkarras/progressive_growing_of_gans](https://github.com/tkarras/progressive_growing_of_gans)  
   
 ### Generation of Synthetic Images  
   
@@ -96,7 +99,10 @@ python beautify_image.py --results_dir experiment_folder --image_path samples/je
 ```
 This will train an algorithm to restore the given image, and beautify it.  
   
-We provide a pretrained model to compute the loss from VGG's extracted features: [models](https://drive.google.com/open?id=1JjILX0echkgxOZSHO3h6xuDpvN-FKD-m).  
+We provide a pretrained model to compute the loss from VGG's extracted features: [models](https://drive.google.com/open?id=1JjILX0echkgxOZSHO3h6xuDpvN-FKD-m). 
+
+![beautification_samples](docs/beautification_samples.png)  
+*Beautification of real faces. Left column are the input real faces. To the right are the beautified images with an increasing beauty level.*  
 
 ## Acknowledgments  
 The research was funded by ERC StG RAPID.  
