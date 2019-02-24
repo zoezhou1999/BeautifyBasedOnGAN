@@ -5,6 +5,9 @@ This is the code repository for our paper: [https://arxiv.org/abs/1902.02593](ht
 ![samples](docs/samples.png)  
 *Generated faces. left to right - least attractive to most attractive.*  
   
+![beautification_samples](docs/beautification_samples.png)  
+*Beautification of real faces. Left column are the input real faces. To the right are the beautified images with an increasing beauty level.*  
+  
 Our generating procedure is heavily based on the implementation of progressive growing of GANs. For more information, please refer to the original implementation:  
 [https://github.com/tkarras/progressive_growing_of_gans](https://github.com/tkarras/progressive_growing_of_gans)  
   
@@ -100,10 +103,7 @@ python beautify_image.py --results_dir experiment_folder --image_path samples/je
 This will train an algorithm to restore the given image, and beautify it.  
   
 We provide a pretrained model to compute the loss from VGG's extracted features: [models](https://drive.google.com/open?id=1JjILX0echkgxOZSHO3h6xuDpvN-FKD-m). 
-
-![beautification_samples](docs/beautification_samples.png)  
-*Beautification of real faces. Left column are the input real faces. To the right are the beautified images with an increasing beauty level.*  
-
+  
 ## Acknowledgments  
 The research was funded by ERC StG RAPID.  
   
