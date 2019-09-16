@@ -11,7 +11,7 @@ from PIL import Image
 import csv
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--model', type=str, default='experiments/train_beauty_vgg/VGG16_beauty_rates.pt', help='path to the trained VGG16 model')
+parser.add_argument('--model', type=str, default='experiments/train_beauty_vgg/VGG16_beauty_rates-new.pt', help='path to the trained VGG16 model')
 parser.add_argument('--dataset', type=str, default='../datasets/CelebA-HQ', help='path to the dataset we want to label')
 parser.add_argument('--beauty_rates', type=int, default=60, help='number of beauty rates/output neurons for the last layer')
 parser.add_argument('--pad_x', type=int, default=0, help='pixels to pad the given images from left and right')
@@ -54,7 +54,7 @@ vgg16.to(device)
 # torch.device('cpu')
 # vgg16.load_state_dict(torch.load(opt.model,map_location=torch.device('cpu')),strict=False)
 
-# upload pretrained weights from beauty labeled dataset
+upload pretrained weights from beauty labeled dataset
 vgg16.load_state_dict(torch.load(opt.model))
 vgg16.eval()
 

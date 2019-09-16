@@ -226,4 +226,4 @@ def train_model(vgg, criterion, optimizer, num_epochs=10):
 
 # train model and save final model
 vgg16 = train_model(vgg16, criterion, optimizer, opt.niter)
-torch.save(vgg16.state_dict(), '{0}/VGG16_beauty_rates.pt'.format(opt.experiment))
+torch.save(vgg16.state_dict(), '{0}/VGG16_beauty_rates-new.pt'.format(opt.experiment))

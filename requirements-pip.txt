@@ -10,4 +10,3 @@ h5py>=2.7.1
 six>=1.11.0
 torch==0.4.1
 torchvision
-
