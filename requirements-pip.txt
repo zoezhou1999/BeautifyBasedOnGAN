@@ -1,4 +1,4 @@
-pinumpy>=1.13.3
+numpy>=1.13.3
 scipy>=1.0.0
 tensorflow-gpu>=1.6.0
 moviepy>=0.2.3.2
