@@ -55,7 +55,7 @@ vgg16.to(device)
 # vgg16.load_state_dict(torch.load(opt.model,map_location=torch.device('cpu')),strict=False)
 
 # upload pretrained weights from beauty labeled dataset
-vgg16.load_state_dict(torch.load(opt.model)
+vgg16.load_state_dict(torch.load(opt.model))
 vgg16.eval()
 
 # create beauty rates lists for each image in dataset
