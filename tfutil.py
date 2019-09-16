@@ -521,7 +521,7 @@ def create_session(config_dict=dict(), force_as_default=False):
 
 def init_uninited_vars(vars=None):
     if vars is None: vars = tf.global_variables()
-    test_vars = [];
+    test_vars = []
     test_ops = []
     with tf.control_dependencies(None):  # ignore surrounding control_dependencies
         for var in vars:

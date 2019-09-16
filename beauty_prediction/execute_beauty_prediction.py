@@ -50,8 +50,12 @@ else:
     print("Running on CPU.")
 vgg16.to(device)
 
+#For CPU
+# torch.device('cpu')
+# vgg16.load_state_dict(torch.load(opt.model,map_location=torch.device('cpu')),strict=False)
+
 # upload pretrained weights from beauty labeled dataset
-vgg16.load_state_dict(torch.load(opt.model))
+vgg16.load_state_dict(torch.load(opt.model)
 vgg16.eval()
 
 # create beauty rates lists for each image in dataset
@@ -96,7 +100,7 @@ for i in range(0,opt.beauty_rates):
 
 # write csv lines to file
 csv_path = "{0}/All_Ratings.csv".format(opt.dataset)
-with open(csv_path, "wb") as csv_file:
+with open(csv_path, "w") as csv_file:
     for line in csv_lines:
         csv_file.write(line)
         csv_file.write('\n')

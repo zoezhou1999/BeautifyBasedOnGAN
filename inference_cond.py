@@ -53,7 +53,8 @@ for j in range(args.outputs):
             labels[0][i] = 1.0
             
             # infer conditioned noise to receive image
-            image = Gs.run(latents, labels, minibatch_size=1, num_gpus=1, out_mul=127.5, out_add=127.5, out_shrink=1, out_dtype=np.uint8)
+            # image = Gs.run(latents, labels, minibatch_size=1, num_gpus=1, out_mul=127.5, out_add=127.5, out_shrink=1, out_dtype=np.uint8)
+            image = Gs.run(latents, labels, minibatch_size=1, num_gpus=0, out_mul=127.5, out_add=127.5, out_shrink=1, out_dtype=np.uint8)
             
             # save generated image as 'i.png' and noise vector as noise_vector.txt
             misc.save_image_grid(image, os.path.join(result_subdir, '{}_{}.png'.format('%04d' % j,i)), [0,255], [1,1])
@@ -78,7 +79,8 @@ for j in range(args.outputs):
                 labels = np.clip(labels, 0.0, 1.0)
             
             # infer conditioned noise to receive image
-            image = Gs.run(latents, labels, minibatch_size=1, num_gpus=1, out_mul=127.5, out_add=127.5, out_shrink=1, out_dtype=np.uint8)
+            # image = Gs.run(latents, labels, minibatch_size=1, num_gpus=1, out_mul=127.5, out_add=127.5, out_shrink=1, out_dtype=np.uint8)
+            image = Gs.run(latents, labels, minibatch_size=1, num_gpus=0, out_mul=127.5, out_add=127.5, out_shrink=1, out_dtype=np.uint8)
             
             # save generated image as 'i.png' and noise vector as noise_vector.txt
             misc.save_image_grid(image, os.path.join(result_subdir, '{}_{}.png'.format('%04d' % j,i)), [0,255], [1,1])
