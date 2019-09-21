@@ -180,16 +180,10 @@ def train_model(vgg, criterion, optimizer, num_epochs=10):
             
             optimizer.zero_grad()
 
+            # out of memory runtime error
+            torch.cuda.empty_cache()
             # infer images and compute loss
-            try:
-                outputs = vgg(images)
-            except RuntimeError as exception:
-                if "out of memory" in str(exception):
-                    print("WARNING: out of memory")
-                    if hasattr(torch.cuda, 'empty_cache'):
-                        torch.cuda.empty_cache()
-                else:
-                    raise exception
+            outputs = vgg(images)
             beauty_rates = torch.squeeze(beauty_rates, 1)
             loss = criterion(outputs, beauty_rates)
 
