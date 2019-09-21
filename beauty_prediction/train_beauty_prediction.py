@@ -181,19 +181,19 @@ def train_model(vgg, criterion, optimizer, num_epochs=10):
             optimizer.zero_grad()
 
             # out of memory runtime error
-            torch.cuda.empty_cache()
-            # infer images and compute loss
-            outputs = vgg(images)
-            beauty_rates = torch.squeeze(beauty_rates, 1)
-            loss = criterion(outputs, beauty_rates)
+            with torch.no_grad():
+                # infer images and compute loss
+                outputs = vgg(images)
+                beauty_rates = torch.squeeze(beauty_rates, 1)
+                loss = criterion(outputs, beauty_rates)
 
-            # sum batches losses
-            loss_val += loss.data
+                # sum batches losses
+                loss_val += loss.data
 
-            # free memory
-            del images, beauty_rates, beauty_class, outputs
-            torch.cuda.empty_cache()
-
+                # free memory
+                del images, beauty_rates, beauty_class, outputs
+                torch.cuda.empty_cache()
+            
         avg_loss_val = loss_val / (len(dataset)*validation_split)
         avg_loss_val_list.append(avg_loss_val)
         
