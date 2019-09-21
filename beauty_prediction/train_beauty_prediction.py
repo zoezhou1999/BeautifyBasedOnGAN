@@ -186,7 +186,7 @@ def train_model(vgg, criterion, optimizer, num_epochs=10):
             loss = criterion(outputs, beauty_rates)
 
             # sum batches losses
-            loss_val += loss.data[0]
+            loss_val += loss.data
 
             # free memory
             del images, beauty_rates, beauty_class, outputs
