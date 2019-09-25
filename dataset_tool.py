@@ -1289,7 +1289,7 @@ def create_celebahq_cond_continuous(tfrecord_dir, celeba_dir, delta_dir, num_thr
         
         # Load delta image and original JPG.
         with zipfile.ZipFile(os.path.join(delta_dir, 'deltas%05d.zip' % (idx - idx % 1000)), 'r') as zip:
-            delta_bytes = zip.read(os.path.join(delta_dir, 'deltas{}.zip'.format(idx - idx % 1000) ,'delta{}.dat'.format(idx)))
+            delta_bytes = zip.read(os.path.join('deltas{}.zip'.format(idx - idx % 1000) ,'delta{}.dat'.format(idx)))
         with open(orig_path, 'rb') as file:
             orig_bytes = file.read()
 
