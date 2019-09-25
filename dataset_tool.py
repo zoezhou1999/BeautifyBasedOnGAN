@@ -861,7 +861,7 @@ def create_celeba(tfrecord_dir, celeba_dir, cx=89, cy=121):
 def create_celebahq(tfrecord_dir, celeba_dir, delta_dir, num_threads=4, num_tasks=100):
     print('Loading CelebA from "%s"' % celeba_dir)
     expected_images = 202599
-    if len(glob.glob(os.path.join(celeba_dir, 'img_celeba/img', '*.jpg'))) != expected_images:
+    if len(glob.glob(os.path.join(celeba_dir, 'img_celeba','img', '*.jpg'))) != expected_images:
         error('Expected to find %d images' % expected_images)
     with open(os.path.join(celeba_dir, 'Anno', 'list_landmarks_celeba.txt'), 'rt') as file:
         landmarks = [[float(value) for value in line.split()[1:]] for line in file.readlines()[2:]]
@@ -893,7 +893,7 @@ def create_celebahq(tfrecord_dir, celeba_dir, delta_dir, num_threads=4, num_task
         error('create_celebahq requires pillow version 3.1.1') # conda install pillow=3.1.1
         
     # Must use libjpeg version 8d for everything to work correctly.
-    img = np.array(PIL.Image.open(os.path.join(celeba_dir, 'img_celeba/img', '000001.jpg')))
+    img = np.array(PIL.Image.open(os.path.join(celeba_dir, 'img_celeba','img', '000001.jpg')))
     md5 = hashlib.md5()
     md5.update(img.tobytes())
     if md5.hexdigest() != '9cad8178d6cb0196b36f7b34bc5eb6d3':
@@ -906,7 +906,7 @@ def create_celebahq(tfrecord_dir, celeba_dir, delta_dir, num_threads=4, num_task
         # Load original image.
         orig_idx = fields['orig_idx'][idx]
         orig_file = fields['orig_file'][idx]
-        orig_path = os.path.join(celeba_dir, 'img_celeba/img', orig_file)
+        orig_path = os.path.join(celeba_dir, 'img_celeba','img', orig_file)
         img = PIL.Image.open(orig_path)
 
         # Choose oriented crop rectangle.
@@ -1005,7 +1005,7 @@ def create_celebahq(tfrecord_dir, celeba_dir, delta_dir, num_threads=4, num_task
 def create_celebahq_cond(tfrecord_dir, celeba_dir, delta_dir, num_threads=4, num_tasks=100, save_images=False):
     print('Loading CelebA from "%s"' % celeba_dir)
     expected_images = 202599
-    if len(glob.glob(os.path.join(celeba_dir, 'img_celeba/img', '*.jpg'))) != expected_images:
+    if len(glob.glob(os.path.join(celeba_dir, 'img_celeba','img', '*.jpg'))) != expected_images:
         error('Expected to find %d images' % expected_images)
     with open(os.path.join(celeba_dir, 'Anno', 'list_landmarks_celeba.txt'), 'rt') as file:
         landmarks = [[float(value) for value in line.split()[1:]] for line in file.readlines()[2:]]
@@ -1037,7 +1037,7 @@ def create_celebahq_cond(tfrecord_dir, celeba_dir, delta_dir, num_threads=4, num
         error('create_celebahq requires pillow version 3.1.1') # conda install pillow=3.1.1
         
     # Must use libjpeg version 8d for everything to work correctly.
-    img = np.array(PIL.Image.open(os.path.join(celeba_dir, 'img_celeba/img', '000001.jpg')))
+    img = np.array(PIL.Image.open(os.path.join(celeba_dir, 'img_celeba','img', '000001.jpg')))
     md5 = hashlib.md5()
     md5.update(img.tobytes())
     if md5.hexdigest() != '9cad8178d6cb0196b36f7b34bc5eb6d3':
@@ -1050,7 +1050,7 @@ def create_celebahq_cond(tfrecord_dir, celeba_dir, delta_dir, num_threads=4, num
         # Load original image.
         orig_idx = fields['orig_idx'][idx]
         orig_file = fields['orig_file'][idx]
-        orig_path = os.path.join(celeba_dir, 'img_celeba/img', orig_file)
+        orig_path = os.path.join(celeba_dir, 'img_celeba','img', orig_file)
         img = PIL.Image.open(orig_path)
 
         # Choose oriented crop rectangle.
@@ -1174,7 +1174,7 @@ def create_celebahq_cond(tfrecord_dir, celeba_dir, delta_dir, num_threads=4, num
 def create_celebahq_cond_continuous(tfrecord_dir, celeba_dir, delta_dir, num_threads=4, num_tasks=100, save_images=False):
     print('Loading CelebA from "%s"' % celeba_dir)
     expected_images = 202599
-    if len(glob.glob(os.path.join(celeba_dir, 'img_celeba/img', '*.jpg'))) != expected_images:
+    if len(glob.glob(os.path.join(celeba_dir, 'img_celeba','img', '*.jpg'))) != expected_images:
         error('Expected to find %d images' % expected_images)
     with open(os.path.join(celeba_dir, 'Anno', 'list_landmarks_celeba.txt'), 'rt') as file:
         landmarks = [[float(value) for value in line.split()[1:]] for line in file.readlines()[2:]]
@@ -1209,7 +1209,7 @@ def create_celebahq_cond_continuous(tfrecord_dir, celeba_dir, delta_dir, num_thr
         error('create_celebahq requires pillow version 3.1.1') # conda install pillow=3.1.1
     
     # Must use libjpeg version 8d for everything to work correctly.
-    img = np.array(PIL.Image.open(os.path.join(celeba_dir, 'img_celeba/img', '000001.jpg')))
+    img = np.array(PIL.Image.open(os.path.join(celeba_dir, 'img_celeba','img', '000001.jpg')))
     md5 = hashlib.md5()
     md5.update(img.tobytes())
     if md5.hexdigest() != '9cad8178d6cb0196b36f7b34bc5eb6d3':
@@ -1222,7 +1222,7 @@ def create_celebahq_cond_continuous(tfrecord_dir, celeba_dir, delta_dir, num_thr
         # Load original image.
         orig_idx = fields['orig_idx'][idx]
         orig_file = fields['orig_file'][idx]
-        orig_path = os.path.join(celeba_dir, 'img_celeba/img', orig_file)
+        orig_path = os.path.join(celeba_dir, 'img_celeba','img', orig_file)
         img = PIL.Image.open(orig_path)
         
         # Choose oriented crop rectangle.
