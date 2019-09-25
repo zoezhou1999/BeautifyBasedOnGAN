@@ -1191,6 +1191,7 @@ def create_celebahq_cond_continuous(tfrecord_dir, celeba_dir, delta_dir, num_thr
     import cryptography.hazmat.primitives.kdf.pbkdf2
     import cryptography.fernet
     expected_zips = 30
+    print("len :{}".format(len(glob.glob(os.path.join(delta_dir, 'delta*.zip')))))
     if len(glob.glob(os.path.join(delta_dir, 'delta*.zip'))) != expected_zips:
         error('Expected to find %d zips' % expected_zips)
     with open(os.path.join(delta_dir, 'image_list.txt'), 'rt') as file:
