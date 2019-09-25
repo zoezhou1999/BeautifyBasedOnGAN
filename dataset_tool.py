@@ -878,7 +878,7 @@ def create_celebahq(tfrecord_dir, celeba_dir, delta_dir, num_threads=4, num_task
     import cryptography.hazmat.primitives.kdf.pbkdf2
     import cryptography.fernet
     expected_zips = 30
-    if len(glob.glob(os.path.join(delta_dir, 'delta*.zip'))) != expected_zips:
+    if len(glob.glob(os.path.join(delta_dir, 'deltas*.zip'))) != expected_zips:
         error('Expected to find %d zips' % expected_zips)
     with open(os.path.join(delta_dir, 'image_list.txt'), 'rt') as file:
         lines = [line.split() for line in file]
@@ -1022,7 +1022,7 @@ def create_celebahq_cond(tfrecord_dir, celeba_dir, delta_dir, num_threads=4, num
     import cryptography.hazmat.primitives.kdf.pbkdf2
     import cryptography.fernet
     expected_zips = 30
-    if len(glob.glob(os.path.join(delta_dir, 'delta*.zip'))) != expected_zips:
+    if len(glob.glob(os.path.join(delta_dir, 'deltas*.zip'))) != expected_zips:
         error('Expected to find %d zips' % expected_zips)
     with open(os.path.join(delta_dir, 'image_list.txt'), 'rt') as file:
         lines = [line.split() for line in file]
@@ -1191,8 +1191,8 @@ def create_celebahq_cond_continuous(tfrecord_dir, celeba_dir, delta_dir, num_thr
     import cryptography.hazmat.primitives.kdf.pbkdf2
     import cryptography.fernet
     expected_zips = 30
-    print("len :{}".format(len(glob.glob(os.path.join(delta_dir, 'delta*.zip')))))
-    if len(glob.glob(os.path.join(delta_dir, 'delta*.zip'))) != expected_zips:
+    print("len :{}".format(len(glob.glob(os.path.join(delta_dir, 'deltas*.zip')))))
+    if len(glob.glob(os.path.join(delta_dir, 'deltas*.zip'))) != expected_zips:
         error('Expected to find %d zips' % expected_zips)
     with open(os.path.join(delta_dir, 'image_list.txt'), 'rt') as file:
         lines = [line.split() for line in file]
