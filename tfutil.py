@@ -499,7 +499,7 @@ def init_tf(config_dict=dict()):
 # {'gpu_options.allow_growth': True}
 
 def create_session(config_dict=dict(), force_as_default=False):
-    config = tf.ConfigProto()
+    config = tf.ConfigProto(allow_soft_placement=True, log_device_placement=True)
     for key, value in config_dict.items():
         fields = key.split('.')
         obj = config
