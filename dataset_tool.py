@@ -973,7 +973,7 @@ def create_celebahq(tfrecord_dir, celeba_dir, delta_dir, num_threads=4, num_task
         
         # Load delta image and original JPG.
         with zipfile.ZipFile(os.path.join(delta_dir, 'deltas%05d.zip' % (idx - idx % 1000)), 'r') as zip:
-            delta_bytes = zip.read('delta%05d.dat' % idx)
+            delta_bytes = zip.read(os.path.join('deltas%05d' % (idx - idx % 1000) ,'delta%05d.dat' % idx))
         with open(orig_path, 'rb') as file:
             orig_bytes = file.read()
         
@@ -1117,7 +1117,7 @@ def create_celebahq_cond(tfrecord_dir, celeba_dir, delta_dir, num_threads=4, num
         
         # Load delta image and original JPG.
         with zipfile.ZipFile(os.path.join(delta_dir, 'deltas%05d.zip' % (idx - idx % 1000)), 'r') as zip:
-            delta_bytes = zip.read('delta%05d.dat' % idx)
+            delta_bytes = zip.read(os.path.join('deltas%05d' % (idx - idx % 1000) ,'delta%05d.dat' % idx))
         with open(orig_path, 'rb') as file:
             orig_bytes = file.read()
         
