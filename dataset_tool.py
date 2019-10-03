@@ -1279,7 +1279,7 @@ def create_celebahq_cond_continuous(tfrecord_dir, celeba_dir, delta_dir, num_thr
         
         # Transform.
         img = img.transform((4096, 4096), PIL.Image.QUAD, (quad + 0.5).flatten(), PIL.Image.BILINEAR)
-        img = img.resize((128, 128), PIL.Image.ANTIALIAS) #size
+        img = img.resize((1024, 1024), PIL.Image.ANTIALIAS) #size
         img = np.asarray(img).transpose(2, 0, 1)
         
         # Verify MD5.
@@ -1299,7 +1299,7 @@ def create_celebahq_cond_continuous(tfrecord_dir, celeba_dir, delta_dir, num_thr
         salt = bytes(orig_file, 'ascii')
         kdf = cryptography.hazmat.primitives.kdf.pbkdf2.PBKDF2HMAC(algorithm=algorithm, length=32, salt=salt, iterations=100000, backend=backend)
         key = base64.urlsafe_b64encode(kdf.derive(orig_bytes))
-        delta = np.frombuffer(bz2.decompress(cryptography.fernet.Fernet(key).decrypt(delta_bytes)), dtype=np.uint8).reshape(3, 128, 128) #size
+        delta = np.frombuffer(bz2.decompress(cryptography.fernet.Fernet(key).decrypt(delta_bytes)), dtype=np.uint8).reshape(3, 1024, 1024) #size
         
         # Apply delta image.
         img = img + delta
