@@ -454,7 +454,8 @@ sched       = EasyDict()                                    # Options for train.
 grid        = EasyDict(size='1080p', layout='random')       # Options for train.setup_snapshot_image_grid().
 
 # Dataset (choose one).
-desc += '-celebahq';            dataset = EasyDict(tfrecord_dir='celebahq/Img/img_celeba/tf_files'); train.mirror_augment = True
+#desc += '-celebahq';            dataset = EasyDict(tfrecord_dir='celebahq/Img/img_celeba/tf_files'); train.mirror_augment = True
+desc += '-ffhq';            dataset = EasyDict(tfrecord_dir='ffhq128x128/tf_files'); train.mirror_augment = True
 #desc += '-celebahq';            dataset = EasyDict(tfrecord_dir='CelebA-HQ/tf_files'); train.mirror_augment = True
 #desc += '-beautydataset';       dataset = EasyDict(tfrecord_dir='beauty_dataset/tf_files'); train.mirror_augment = True
 #desc += '-beautydataset_asian';       dataset = EasyDict(tfrecord_dir='beauty_dataset/only_asian/tf_files'); train.mirror_augment = True
