@@ -24,10 +24,11 @@ misc.init_output_logging()
 print('Initializing TensorFlow...')
 env = EasyDict() # Environment variables, set by the main program in train.py.
 env.TF_CPP_MIN_LOG_LEVEL = '1' # Print warnings and errors, but disable debug info.
-env.CUDA_VISIBLE_DEVICES = '0' # Unspecified (default) = Use all available GPUs. List of ints = CUDA device numbers to use. change to '0' if first GPU is better
+env.CUDA_VISIBLE_DEVICES = '0,1' # Unspecified (default) = Use all available GPUs. List of ints = CUDA device numbers to use. change to '0' if first GPU is better
 os.environ.update(env)
 tf_config = EasyDict() # TensorFlow session config, set by tfutil.init_tf().
 tf_config['graph_options.place_pruned_graph'] = True # False (default) = Check that all ops are available on the designated device.
+tf_config['gpu_options.allow_growth']          = True     # False (default) = Allocate all GPU memory at the beginning. True = Allocate only as much GPU memory as needed.
 tfutil.init_tf(tf_config)
 
 #load network
