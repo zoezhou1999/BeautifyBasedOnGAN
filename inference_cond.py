@@ -29,6 +29,7 @@ os.environ.update(env)
 tf_config = EasyDict() # TensorFlow session config, set by tfutil.init_tf().
 tf_config['graph_options.place_pruned_graph'] = True # False (default) = Check that all ops are available on the designated device.
 tf_config['gpu_options.allow_growth']          = True     # False (default) = Allocate all GPU memory at the beginning. True = Allocate only as much GPU memory as needed.
+tf_config['gpu_options.per_process_gpu_memory_fraction']          = 0.5
 tfutil.init_tf(tf_config)
 
 #load network
