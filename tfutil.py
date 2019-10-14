@@ -1246,7 +1246,7 @@ class Network:
         stohastic_clipping = True,
         return_as_list  = False,    # True = return a list of NumPy arrays, False = return a single NumPy array, or a tuple if there are multiple outputs.
         print_progress  = False,    # Print progress to the console? Useful for very large input arrays.
-        minibatch_size  = None,     # Maximum minibatch size to use, None = disable batching.
+        minibatch_size  = 8,     # Maximum minibatch size to use, None = disable batching.
         num_gpus        = 1,        # Number of GPUs to use.
         out_mul         = 1.0,      # Multiplicative constant to apply to the output(s).
         out_add         = 0.0,      # Additive constant to apply to the output(s).
