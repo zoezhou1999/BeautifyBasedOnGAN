@@ -24,7 +24,7 @@ misc.init_output_logging()
 print('Initializing TensorFlow...')
 env = EasyDict() # Environment variables, set by the main program in train.py.
 env.TF_CPP_MIN_LOG_LEVEL = '1' # Print warnings and errors, but disable debug info.
-env.CUDA_VISIBLE_DEVICES = '1' # Unspecified (default) = Use all available GPUs. List of ints = CUDA device numbers to use. change to '0' if first GPU is better
+env.CUDA_VISIBLE_DEVICES = '0' # Unspecified (default) = Use all available GPUs. List of ints = CUDA device numbers to use. change to '0' if first GPU is better
 os.environ.update(env)
 tf_config = EasyDict() # TensorFlow session config, set by tfutil.init_tf().
 tf_config['graph_options.place_pruned_graph'] = True # False (default) = Check that all ops are available on the designated device.
@@ -53,8 +53,8 @@ for j in range(args.outputs):
             labels[0][i] = 1.0
             
             # infer conditioned noise to receive image
-            # image = Gs.run(latents, labels, minibatch_size=1, num_gpus=1, out_mul=127.5, out_add=127.5, out_shrink=1, out_dtype=np.uint8)
-            image = Gs.run(latents, labels, minibatch_size=1, num_gpus=0, out_mul=127.5, out_add=127.5, out_shrink=1, out_dtype=np.uint8)
+            image = Gs.run(latents, labels, minibatch_size=1, num_gpus=1, out_mul=127.5, out_add=127.5, out_shrink=1, out_dtype=np.uint8)
+            #image = Gs.run(latents, labels, minibatch_size=1, num_gpus=0, out_mul=127.5, out_add=127.5, out_shrink=1, out_dtype=np.uint8)
             
             # save generated image as 'i.png' and noise vector as noise_vector.txt
             misc.save_image_grid(image, os.path.join(result_subdir, '{}_{}.png'.format('%04d' % j,i)), [0,255], [1,1])
