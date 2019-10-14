@@ -21,7 +21,7 @@ parser.add_argument('--lr', '-lr', help='learning rate of algorithm', default=0.
 parser.add_argument('--alpha', '-alpha', help='weight of normal loss in relation to vgg loss', default=0.7, type=float)
 parser.add_argument('--gpu', '-gpu', help='gpu index for the algorithm to run on', default='0', type=str)
 parser.add_argument('--image_path', '-image_path', help='full path to image', default='../datasets/CelebA-HQ/img/03134.png', type=str)
-parser.add_argument('--resolution', '-resolution', help='resolution of the generated image', default=256, type=int)
+parser.add_argument('--resolution', '-resolution', help='resolution of the generated image', default=128, type=int)
 
 args = parser.parse_args()
 
