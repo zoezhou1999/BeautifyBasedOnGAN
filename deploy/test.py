@@ -21,7 +21,6 @@ model = face_model.FaceModel(args)
 
 img = cv2.imread(args.imagepath1)
 img=cv2.resize(img,(112,112))
-
 img = model.get_input(img)
 f1 = model.get_feature(img)
 print(f1[0:10])
@@ -31,6 +30,7 @@ print(age)
 
 img = cv2.imread(args.imagepath2)
 img=cv2.resize(img,(112,112))
+img = model.get_input(img)
 f2 = model.get_feature(img)
 print(f2[0:10])
 gender, age = model.get_ga(img)
