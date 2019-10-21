@@ -22,17 +22,21 @@ We recommend using Anaconda for python and creating a virtual environment the sa
 Anaconda can be downloaded from here: [https://www.anaconda.com/distribution/](https://www.anaconda.com/distribution/)  
 
 Create environment for Python 3.6:  
+
 ```
 conda create -n beholder python=3.6 anaconda
 ```
+
 Enter the environment and install python requirements:  
+
 ```
 conda activate beholder
 pip install -r requirements-pip.txt
 ```
 
 I used miniconda.
-installation insturction(you do not need to run if you use the same environment as me)
+
+Installation Insturction (You do not need to run these if you use the same environment as mine)
 
 ```
 bash Miniconda3-latest-Linux-x86_64.sh
@@ -55,7 +59,8 @@ The datasets we worked on can be found in these links:
   
 To reinforce additional datasets with beauty scores the same way SCUT-FBP-5500 has, we conducted a procedure to train a beauty prediction model and predict their beauty scores.  
   
-An exam ple command to train a beauty prediction model:  
+An exam ple command to train a beauty prediction model: 
+ 
 ```
 python train_beauty_prediction.py --dataset ../datasets/scutfbp5500 --experiment trained_model
 ```
@@ -66,14 +71,17 @@ python train_beauty_prediction.py --dataset ../datasets/ffhq128x128 --experiment
 
 This script will initiate a VGG16 network pretrained on imagenet, train it on SCUT-FBP-5500 and save the output model in the experiment folder.  
 It is required that the dataset we are training on will be stored in the following structure:  
+
 ```
 root folder
 -- All_Ratings.csv
 -- img
 ```
+
 All_Ratings.csv is the beauty scores of our data in the same format used in SCUT-FBP-5500 and img is the folder containing the images.  
   
 An example command to label an external dataset using our trained model:  
+
 ```
 python execute_beauty_prediction.py --model trained_model/VGG16_beauty_rates.pt --dataset ../datasets/CelebA-HQ
 ```
@@ -84,9 +92,11 @@ python execute_beauty_prediction.py --model trained_model/VGG16_beauty_rates-new
 This script will reload our trained VGG16 network and predict beauty scores for all images that in ../datasets/CelebA-HQ/img in order to store a predicted All_Ratings.csv in ../datasets/CelebA-HQ.  
   
 An example command to predict beauty scores for a single image:  
+
 ```
 python execute_beauty_prediction_single.py --model trained_model/VGG16_beauty_rates.pt --image sample.png
 ```
+
 This script will reload our trained VGG16 network and present beauty scores for the given image sample.png.  
   
 We provide a pretrained model to execute beauty prediction: [models](https://drive.google.com/open?id=1LbzYwPcYJ7pv1X2P5xmUDGiBzyIQGYOY).  
@@ -150,18 +160,7 @@ nohup python beautify_image.py --results_dir ./results/008-pgan-ffhq-cond-preset
 
 ### Test ./datasets/ffhq128x128/img/00001.png(00003.png 00010.png 00048.png 00016.png 00081.png)
 
-##### img/00001.png
-![00001](docs/00001.png)  
-##### img/00003.png
-
-##### img/00010.png
-
-##### img/00048.png
-
-##### img/00016.png
-
-##### img/00081.png
-
+This is result-pdf github link. 
 
 This will train an algorithm to restore the given image, and beautify it.  
   

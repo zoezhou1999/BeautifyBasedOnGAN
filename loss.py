@@ -414,7 +414,9 @@ import numpy as np
 import tensorflow as tf
 import pdb
 import tfutil
-
+import identity_predicition.face_model
+import cv2
+import misc
 #----------------------------------------------------------------------------
 # Convenience func that casts all of its arguments to tf.float32.
 
@@ -428,14 +430,31 @@ def fp32(*values):
 # Generator loss function used in the paper (WGAN + AC-GAN).
 
 def G_wgan_acgan(G, D, opt, training_set, minibatch_size,
-    cond_weight = 1.0): # Weight of the conditioning term.
+    cond_weight = 1.0, id_weight = 0.5, id_label_size = 512): # Weight of the conditioning term and id feature and Dimensionality of the id_feature labels
 
     latents = tf.random_normal([minibatch_size] + G.input_shapes[0][1:])
     labels = training_set.get_random_labels_tf(minibatch_size)
     fake_images_out = G.get_output_for(latents, labels, is_training=True)
     fake_scores_out, fake_labels_out = fp32(D.get_output_for(fake_images_out, labels, is_training=True))
     loss = -fake_scores_out
-    
+
+    # Output: Images [minibatch, channel, height, width].
+
+    identity_logits=[]
+    model = face_model.FaceModel(opt)
+    for i in range(np.size(fake_images_out,0)):
+        misc.save_image(fake_images_out[i], 'tmp.jpg')
+        img = cv2.resize(cv2.imread('tmp.jpg'), (112, 112))
+        img = model.get_input(img)
+        f = model.get_feature(img)
+        identity_logits.append(f)
+
+    identity_logits = np.array(identity_logits, dtype=np.float32)
+    identity_labels = labels[:, np.size(labels,1)-id_label_size : np.size(labels, 1)]
+    identity_loss = tf.reduce_mean(tf.nn.sparse_softmax_cross_entropy_with_logits(identity_logits, identity_labels))
+
+    loss += id_weight * identity_loss
+
     """
     if D.output_shapes[1][1] > 0:
         with tf.name_scope('LabelPenalty'):

@@ -1374,6 +1374,16 @@ def load_csv(dataset_folder):
 
 #----------------------------------------------------------------------------
 
+def load_id_features(dataset_folder):
+    # id_feature will be stored in the parent folder
+    id_features = os.path.dirname(dataset_folder)
+    id_features_np = pickle.load(open(os.path.join(id_features,"id_features.p"), "rb"))
+    print("loading id features...shape is")
+    print(id_features_np.shape)
+    return id_features_np
+
+#----------------------------------------------------------------------------
+
 def create_from_images(tfrecord_dir, image_dir, shuffle):
     print('Loading images from "%s"' % image_dir)
     image_filenames = sorted(glob.glob(os.path.join(image_dir, '*')))
@@ -1443,6 +1453,49 @@ def create_from_images_cond(tfrecord_dir, image_dir, shuffle):
 
 #----------------------------------------------------------------------------
 
+def create_from_images_cond_id(tfrecord_dir, image_dir, shuffle):
+    print('Loading images from "%s"' % image_dir)
+    image_filenames = sorted(glob.glob(os.path.join(image_dir, '*')))
+    if len(image_filenames) == 0:
+        error('No input images found')
+
+    img = np.asarray(PIL.Image.open(image_filenames[0]))
+    resolution = img.shape[0]
+    channels = img.shape[2] if img.ndim == 3 else 1
+    if img.shape[1] != resolution:
+        error('Input images must have the same width and height')
+    if resolution != 2 ** int(np.floor(np.log2(resolution))):
+        error('Input image resolution must be a power-of-two')
+    if channels not in [1, 3]:
+        error('Input images must be stored as RGB or grayscale')
+
+    beauty_rates = load_csv(tfrecord_dir)
+
+    # create numpy of [len(images),1] composed of mean values ranged in [0,10]
+    beauty_rates_mean = np.mean(beauty_rates, axis=1) * 10
+    # round values into their closest integers
+    beauty_rates_mean = (np.rint(beauty_rates_mean)).astype(int)
+
+    # create one hot vector and fill it
+    beauty_rates_one_hot = np.zeros((beauty_rates.shape[0], np.max(beauty_rates_mean) + 1), dtype=np.float32)
+    beauty_rates_one_hot[np.arange(beauty_rates.shape[0]), beauty_rates_mean] = 1.0
+    id_features = load_id_features(tfrecord_dir)
+
+    with TFRecordExporter(tfrecord_dir, len(image_filenames)) as tfr:
+        order = tfr.choose_shuffled_order() if shuffle else np.arange(len(image_filenames))
+        for idx in range(order.size):
+            img = np.asarray(PIL.Image.open(image_filenames[order[idx]]))
+            if channels == 1:
+                img = img[np.newaxis, :, :]  # HW => CHW
+            else:
+                img = img.transpose(2, 0, 1)  # HWC => CHW
+            tfr.add_image(img)
+
+        combined_labels = np.hstack((beauty_rates_one_hot[order], id_features[order]))
+        tfr.add_labels(combined_labels)
+
+# ----------------------------------------------------------------------------
+
 def create_from_images_cond_continuous(tfrecord_dir, image_dir, shuffle):
     print('Loading images from "%s"' % image_dir)
     image_filenames = sorted(glob.glob(os.path.join(image_dir, '*')))
@@ -1474,6 +1527,40 @@ def create_from_images_cond_continuous(tfrecord_dir, image_dir, shuffle):
         tfr.add_labels(beauty_rates[order])
 
 #----------------------------------------------------------------------------
+
+def create_from_images_cond_continuous_id(tfrecord_dir, image_dir, shuffle):
+    print('Loading images from "%s"' % image_dir)
+    image_filenames = sorted(glob.glob(os.path.join(image_dir, '*')))
+    if len(image_filenames) == 0:
+        error('No input images found')
+
+    img = np.asarray(PIL.Image.open(image_filenames[0]))
+    resolution = img.shape[0]
+    channels = img.shape[2] if img.ndim == 3 else 1
+    if img.shape[1] != resolution:
+        error('Input images must have the same width and height')
+    if resolution != 2 ** int(np.floor(np.log2(resolution))):
+        error('Input image resolution must be a power-of-two')
+    if channels not in [1, 3]:
+        error('Input images must be stored as RGB or grayscale')
+
+    beauty_rates = load_csv(tfrecord_dir)
+    id_features = load_id_features(tfrecord_dir)
+
+    with TFRecordExporter(tfrecord_dir, len(image_filenames)) as tfr:
+        order = tfr.choose_shuffled_order() if shuffle else np.arange(len(image_filenames))
+        for idx in range(order.size):
+            img = np.asarray(PIL.Image.open(image_filenames[order[idx]]))
+            if channels == 1:
+                img = img[np.newaxis, :, :]  # HW => CHW
+            else:
+                img = img.transpose(2, 0, 1)  # HWC => CHW
+            tfr.add_image(img)
+
+        combined_labels=np.hstack((beauty_rates[order],id_features[order]))
+        tfr.add_labels(combined_labels)
+
+# ----------------------------------------------------------------------------
 
 def create_from_hdf5(tfrecord_dir, hdf5_filename, shuffle):
     print('Loading HDF5 archive from "%s"' % hdf5_filename)
@@ -1599,6 +1686,18 @@ def execute_cmdline(argv):
 
     p = add_command(    'create_from_images_cond_continuous', 'Create dataset from a directory full of images with continuous conditioning.',
                                             'create_from_images_cond datasets/mydataset myimagedir')
+    p.add_argument(     'tfrecord_dir',     help='New dataset directory to be created')
+    p.add_argument(     'image_dir',        help='Directory containing the images, csv file should be adjacent to them')
+    p.add_argument(     '--shuffle',        help='Randomize image order (default: 1)', type=int, default=1)
+    #newly-added
+    p = add_command(    'create_from_images_cond_id', 'Create dataset from a directory full of images with conditioning and id features.',
+                                            'create_from_images_cond_id datasets/mydataset myimagedir')
+    p.add_argument(     'tfrecord_dir',     help='New dataset directory to be created')
+    p.add_argument(     'image_dir',        help='Directory containing the images, csv file should be adjacent to them')
+    p.add_argument(     '--shuffle',        help='Randomize image order (default: 1)', type=int, default=1)
+    #newly-added
+    p = add_command(    'create_from_images_cond_continuous_id', 'Create dataset from a directory full of images with continuous conditioning and id features.',
+                                            'create_from_images_cond_continuous_id datasets/mydataset myimagedir')
     p.add_argument(     'tfrecord_dir',     help='New dataset directory to be created')
     p.add_argument(     'image_dir',        help='Directory containing the images, csv file should be adjacent to them')
     p.add_argument(     '--shuffle',        help='Randomize image order (default: 1)', type=int, default=1)

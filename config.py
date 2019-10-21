@@ -446,7 +446,7 @@ dataset     = EasyDict()                                    # Options for datase
 train       = EasyDict(func='train.train_progressive_gan')  # Options for main training func.
 G           = EasyDict(func='networks.G_paper')             # Options for generator network.
 D           = EasyDict(func='networks.D_paper')             # Options for discriminator network.
-G_opt       = EasyDict(beta1=0.0, beta2=0.99, epsilon=1e-8) # Options for generator optimizer.
+G_opt       = EasyDict(beta1=0.0, beta2=0.99, epsilon=1e-8, det=0, flip=0, gpu=0, image_size='112,112', model='./identity_predicition/models/model-r50-am-lfw/model,0000', threshold=1.24) # Options for generator optimizer and arcFace model.
 D_opt       = EasyDict(beta1=0.0, beta2=0.99, epsilon=1e-8) # Options for discriminator optimizer.
 G_loss      = EasyDict(func='loss.G_wgan_acgan')            # Options for generator loss.
 D_loss      = EasyDict(func='loss.D_wgangp_acgan')          # Options for discriminator loss.
@@ -456,6 +456,8 @@ grid        = EasyDict(size='1080p', layout='random')       # Options for train.
 # Dataset (choose one).
 #desc += '-celebahq';            dataset = EasyDict(tfrecord_dir='celebahq/Img/img_celeba/tf_files'); train.mirror_augment = True
 desc += '-ffhq';            dataset = EasyDict(tfrecord_dir='ffhq128x128/tf_files'); train.mirror_augment = True
+#desc += '-ffhq_id';            dataset = EasyDict(tfrecord_dir='ffhq128x128/tf_files_id'); train.mirror_augment = True
+
 #desc += '-celebahq';            dataset = EasyDict(tfrecord_dir='CelebA-HQ/tf_files'); train.mirror_augment = True
 #desc += '-beautydataset';       dataset = EasyDict(tfrecord_dir='beauty_dataset/tf_files'); train.mirror_augment = True
 #desc += '-beautydataset_asian';       dataset = EasyDict(tfrecord_dir='beauty_dataset/only_asian/tf_files'); train.mirror_augment = True
