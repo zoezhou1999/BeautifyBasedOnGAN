@@ -80,10 +80,10 @@ Please check [Dataset-Zoo](https://github.com/deepinsight/insightface/wiki/Datas
 
 ### Train
 
-1. Install `MXNet` with GPU support (Python 2.7).
+1. Install `MXNet` with GPU support (Python 2.7). It should be matched with your cuda verison......Be careful when using conda installs mxnet. (Do not use it.) If conda uninstalls some packages, some errors about 'file not found' may occur. Deleting or removing relevant folders in site-package might fix these issues.
 
 ```
-pip install mxnet-cu90
+pip install mxnet-cu<version>
 ```
 
 2. Clone the InsightFace repository. We call the directory insightface as *`INSIGHTFACE_ROOT`*.
