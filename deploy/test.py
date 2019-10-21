@@ -6,7 +6,7 @@ import numpy as np
 
 parser = argparse.ArgumentParser(description='face model test')
 # general
-parser.add_argument('--image-size', default='128,128', help='')
+parser.add_argument('--image-size', default='112,112', help='')
 parser.add_argument('--imagepath1', default='Tom_Hanks_54745.png', help='')
 parser.add_argument('--imagepath2', default='Tom_Hanks_54745.png', help='')
 parser.add_argument('--model', default='/home/hxz/GraduationProject/arcface/models/model-r50-am-lfw/model,0000', help='path to load model.')
@@ -18,7 +18,10 @@ parser.add_argument('--threshold', default=1.24, type=float, help='ver dist thre
 args = parser.parse_args()
 
 model = face_model.FaceModel(args)
+
 img = cv2.imread(args.imagepath1)
+img=cv2.resize(img,(112,112))
+
 img = model.get_input(img)
 f1 = model.get_feature(img)
 print(f1[0:10])
@@ -27,11 +30,12 @@ print(gender)
 print(age)
 
 img = cv2.imread(args.imagepath2)
+img=cv2.resize(img,(112,112))
+f2 = model.get_feature(img)
+print(f2[0:10])
 gender, age = model.get_ga(img)
 print(gender)
 print(age)
-f2 = model.get_feature(img)
-print(f2[0:10])
 
 dist = np.sum(np.square(f1-f2))
 print(dist)
