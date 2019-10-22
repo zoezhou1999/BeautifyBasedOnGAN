@@ -29,4 +29,6 @@ for i, file in enumerate(sorted(os.listdir(images_dir))):
     f = model.get_feature(img)
     id_features.append(f)
 id_features=np.array(id_features,dtype=np.float32)
+print("shape of id_feature is")
+print(id_features.shape)
 pickle.dump(id_features, open(os.path.join(args.dataset,"id_features.p"), "wb"))
