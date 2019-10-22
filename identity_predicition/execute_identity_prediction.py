@@ -4,6 +4,7 @@ import cv2
 import sys
 import numpy as np
 import pickle
+import os
 
 parser = argparse.ArgumentParser(description='face identity prediction')
 
