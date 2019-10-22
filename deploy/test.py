@@ -7,8 +7,8 @@ import numpy as np
 parser = argparse.ArgumentParser(description='face model test')
 # general
 parser.add_argument('--image-size', default='112,112', help='')
-parser.add_argument('--imagepath1', default='Tom_Hanks_54745.png', help='')
-parser.add_argument('--imagepath2', default='Tom_Hanks_54745.png', help='')
+parser.add_argument('--imagepath1', default='test.png', help='')
+parser.add_argument('--imagepath2', default='test.png', help='')
 parser.add_argument('--model', default='/home/hxz/GraduationProject/arcface/models/model-r50-am-lfw/model,0000', help='path to load model.')
 parser.add_argument('--ga-model', default='/home/hxz/GraduationProject/arcface/models/gamodel-r50/model,0000', help='path to load model.')
 parser.add_argument('--gpu', default=0, type=int, help='gpu id')
