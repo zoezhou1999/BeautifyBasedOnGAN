@@ -27,6 +27,7 @@ for i, file in enumerate(sorted(os.listdir(images_dir))):
     img = cv2.resize(cv2.imread(os.path.join(images_dir,file)), (112, 112))
     img = model.get_input(img)
     f = model.get_feature(img)
+    print(f[0:10])
     id_features.append(f)
 id_features=np.array(id_features,dtype=np.float32)
 print("shape of id_feature is")
