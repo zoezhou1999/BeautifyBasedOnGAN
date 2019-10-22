@@ -446,7 +446,7 @@ dataset     = EasyDict()                                    # Options for datase
 train       = EasyDict(func='train.train_progressive_gan')  # Options for main training func.
 G           = EasyDict(func='networks.G_paper')             # Options for generator network.
 D           = EasyDict(func='networks.D_paper')             # Options for discriminator network.
-G_opt       = EasyDict(beta1=0.0, beta2=0.99, epsilon=1e-8, det=0, flip=0, gpu=0, image_size='112,112', model='./identity_predicition/models/model-r50-am-lfw/model,0000', threshold=1.24) # Options for generator optimizer and arcFace model.
+G_opt       = EasyDict(beta1=0.0, beta2=0.99, epsilon=1e-8, det=0, flip=0, gpu=0, ga_model='./identity_predicition/models/gamodel-r50/model,0000', image_size='112,112', model='./identity_predicition/models/model-r50-am-lfw/model,0000', threshold=1.24) # Options for generator optimizer and arcFace model.
 D_opt       = EasyDict(beta1=0.0, beta2=0.99, epsilon=1e-8) # Options for discriminator optimizer.
 G_loss      = EasyDict(func='loss.G_wgan_acgan')            # Options for generator loss.
 D_loss      = EasyDict(func='loss.D_wgangp_acgan')          # Options for discriminator loss.

@@ -9,6 +9,7 @@ parser = argparse.ArgumentParser(description='face identity prediction')
 
 parser.add_argument('--image-size', default='112,112', help='') #no use maybe
 parser.add_argument('--model', default='./models/model-r50-am-lfw/model,0000', help='path to load model.')
+parser.add_argument('--ga-model', default='./models/gamodel-r50/model,0000', help='path to load model.')
 parser.add_argument('--dataset', type=str, default='../datasets/ffhq128x128', help='path to the dataset we want to label')
 parser.add_argument('--gpu', default=0, type=int, help='gpu id')
 parser.add_argument('--det', default=0, type=int, help='mtcnn option, 1 means using R+O, 0 means detect from begining')
