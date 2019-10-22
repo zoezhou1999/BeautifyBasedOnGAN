@@ -1693,13 +1693,13 @@ def execute_cmdline(argv):
     p = add_command(    'create_from_images_cond_id', 'Create dataset from a directory full of images with conditioning and id features.',
                                             'create_from_images_cond_id datasets/mydataset myimagedir')
     p.add_argument(     'tfrecord_dir',     help='New dataset directory to be created')
-    p.add_argument(     'image_dir',        help='Directory containing the images, csv file should be adjacent to them')
+    p.add_argument(     'image_dir',        help='Directory containing the images, csv file and id features should be adjacent to them')
     p.add_argument(     '--shuffle',        help='Randomize image order (default: 1)', type=int, default=1)
     #newly-added
     p = add_command(    'create_from_images_cond_continuous_id', 'Create dataset from a directory full of images with continuous conditioning and id features.',
                                             'create_from_images_cond_continuous_id datasets/mydataset myimagedir')
     p.add_argument(     'tfrecord_dir',     help='New dataset directory to be created')
-    p.add_argument(     'image_dir',        help='Directory containing the images, csv file should be adjacent to them')
+    p.add_argument(     'image_dir',        help='Directory containing the images, csv file and id features should be adjacent to them')
     p.add_argument(     '--shuffle',        help='Randomize image order (default: 1)', type=int, default=1)
 
     p = add_command(    'create_from_hdf5', 'Create dataset from legacy HDF5 archive.',
