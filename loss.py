@@ -441,7 +441,7 @@ def G_wgan_acgan(G, D, opt, training_set, minibatch_size,
     # Output: Images [minibatch, channel, height, width].
 
     identity_logits=[]
-    model = face_model.FaceModel(opt)
+    model = identity_predicition.face_model.FaceModel(opt)
     for i in range(np.size(fake_images_out,0)):
         misc.save_image(fake_images_out[i], 'tmp.jpg')
         img = cv2.resize(cv2.imread('tmp.jpg'), (112, 112))
