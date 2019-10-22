@@ -25,6 +25,7 @@ images_dir = "{0}/img".format(args.dataset)
 number_of_images = len(os.listdir(images_dir))
 for i, file in enumerate(sorted(os.listdir(images_dir))):
     img = cv2.resize(cv2.imread(os.path.join(images_dir,file)), (112, 112))
+    print(file)
     img = model.get_input(img)
     f = model.get_feature(img)
     print(f[0:10])
