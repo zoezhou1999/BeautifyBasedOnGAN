@@ -439,7 +439,10 @@ def setup_snapshot_image_grid(G, training_set,
 
     # Fill in reals and labels.
     reals = np.zeros([gw * gh] + training_set.shape, dtype=training_set.dtype)
-    labels = np.zeros([gw * gh, training_set.label_size], dtype=training_set.label_dtype)
+    # add id
+    labels = misc.make_rand_labels(gw * gh, training_set.label_size, dtype = training_set.label_dtype)
+    # labels = np.zeros([gw * gh, training_set.label_size], dtype=training_set.label_dtype)
+
     for idx in range(gw * gh):
         x = idx % gw; y = idx // gw
         while True:

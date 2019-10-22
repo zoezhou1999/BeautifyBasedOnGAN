@@ -424,6 +424,7 @@ import PIL.Image
 import config
 import dataset
 import legacy
+from random import gauss
 
 #----------------------------------------------------------------------------
 # Convenience wrappers for pickle that are able to load data produced by
@@ -645,6 +646,22 @@ def get_id_string_for_network_pkl(network_pkl):
 
 def load_network_pkl(run_id_or_result_subdir_or_network_pkl, snapshot=None):
     return load_pkl(locate_network_pkl(run_id_or_result_subdir_or_network_pkl, snapshot))
+
+def make_rand_labels(num_latents, dims, dtype = None, subdims = 512):
+    if dtype is None:
+        dtype = np.float32
+
+    id_vectors = []
+    for i in range(num_latents):
+        vector = [gauss(0, 1) for j in range(subdims)]
+        mag = sum(x ** 2 for x in vector) ** .5
+        id_vectors.append([x/mag for x in vector])
+
+    beauty_rates_vectors = np.zeros([num_latents, dims - subdims], dtype=dtype)
+    id_vectors = np.array(id_vectors, dtype=dtype)
+    combined_vectors = np.hstack((beauty_rates_vectors, id_vectors))
+
+    return combined_vectors
 
 def random_latents(num_latents, G, random_state=None):
     if random_state is not None:
