@@ -39,7 +39,7 @@ class FaceNet():
 
     def predict(self, img_path):
         img = cv2.imread(img_path)
-        embed = sess.run(self.output, feed_dict={self.input: self.preprocess_img(img), self.phase_train_placeholder: False})
+        embed = self.session.run(self.output, feed_dict={self.input: self.preprocess_img(img), self.phase_train_placeholder: False})
         embed = normalize(embed)
         embed = embed.reshape((512,))
         return embed
