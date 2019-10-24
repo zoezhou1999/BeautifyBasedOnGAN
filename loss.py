@@ -413,8 +413,10 @@
 import numpy as np
 import tensorflow as tf
 import pdb
+import sys
 import tfutil
-import identity_prediction.facenet
+sys.path.append("./identity_prediction/")
+import facenet
 import cv2
 import misc
 #----------------------------------------------------------------------------
