@@ -1559,6 +1559,8 @@ def create_from_images_cond_continuous_id(tfrecord_dir, image_dir, shuffle):
             tfr.add_image(img)
 
         combined_labels=np.hstack((beauty_rates[order],id_features[order]))
+        print("combined_labels.shape:")
+        print(combined_labels.shape)
         tfr.add_labels(combined_labels)
 
 # ----------------------------------------------------------------------------

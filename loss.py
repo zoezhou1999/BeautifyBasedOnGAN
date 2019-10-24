@@ -443,8 +443,8 @@ def G_wgan_acgan(G, D, opt, training_set, minibatch_size,
     identity_logits=[]
     model = identity_predicition.facenet.FaceNet(opt.model)
     for i in range(np.size(fake_images_out,0)):
-        misc.save_image(fake_images_out[i], 'tmp.jpg')
-        f = model.predict('tmp.jpg')
+        misc.save_image(fake_images_out[i], 'tmp.png')
+        f = model.predict('tmp.png')
         identity_logits.append(f)
 
     identity_logits = np.array(identity_logits, dtype=np.float32)
