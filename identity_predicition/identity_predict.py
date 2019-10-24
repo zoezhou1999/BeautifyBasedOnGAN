@@ -43,7 +43,7 @@ number_of_images = len(os.listdir(images_dir))
 config = tf.ConfigProto(allow_soft_placement=True, log_device_placement=True)
 config.gpu_options.allow_growth = True
 
-with tf.Session(graph=graph) as sess:
+with tf.Session(graph=graph, config=config) as sess:
     for i, file in enumerate(sorted(os.listdir(images_dir))):
         img = cv2.imread(os.path.join(images_dir, file))
         print(file)
