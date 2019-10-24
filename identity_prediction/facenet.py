@@ -18,7 +18,7 @@ class FaceNet():
         config = tf.ConfigProto(allow_soft_placement=True, log_device_placement=True)
         config.gpu_options.allow_growth = True
         self.session = tf.Session(config=config)
-        graph = load_pb(self.model_path)
+        graph = self.load_pb(self.model_path)
         self.input = graph.get_tensor_by_name('input:0')
         self.output = graph.get_tensor_by_name('embeddings:0')
         self.phase_train_placeholder = graph.get_tensor_by_name("phase_train:0")
