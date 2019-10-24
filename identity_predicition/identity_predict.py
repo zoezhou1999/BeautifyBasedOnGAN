@@ -48,6 +48,7 @@ with tf.Session(graph=graph, config=config) as sess:
         img = cv2.imread(os.path.join(images_dir, file))
         print(file)
         embed = sess.run(output, feed_dict={input: preprocess_img(img), phase_train_placeholder: False})
+        print(embed.shape)
         print(embed[0:10])
         id_features.append(embed)
 
