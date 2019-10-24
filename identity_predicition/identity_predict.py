@@ -1,14 +1,12 @@
 import tensorflow as tf
 import numpy as np
 import argparse
-import facenet
 import os
 import sys
 import math
 import pickle
 from sklearn.svm import SVC
 from scipy import misc
-import align.detect_face
 from six.moves import xrange
 import cv2
 
