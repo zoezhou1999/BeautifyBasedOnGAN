@@ -445,7 +445,10 @@ def G_wgan_acgan(G, D, opt, training_set, minibatch_size,
 
     identity_logits=[]
     model = facenet.FaceNet(config.model.model_path)
-    for i in range(minibatch_size):
+    print("minibatch_size")
+    print(minibatch_size)
+    print(int(minibatch_size))
+    for i in range(int(minibatch_size)):
         misc.save_image(fake_images_out[i], 'tmp.png')
         f = model.predict('tmp.png')
         identity_logits.append(f)
