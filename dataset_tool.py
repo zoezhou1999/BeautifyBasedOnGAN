@@ -425,6 +425,7 @@ import pdb
 
 import tfutil
 import dataset
+import pickle
 
 #----------------------------------------------------------------------------
 
