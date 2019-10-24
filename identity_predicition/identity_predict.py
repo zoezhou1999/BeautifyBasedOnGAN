@@ -9,6 +9,7 @@ from sklearn.svm import SVC
 from scipy import misc
 from six.moves import xrange
 import cv2
+from sklearn.preprocessing import normalize
 
 def load_pb(path_to_pb):
     with tf.gfile.GFile(path_to_pb, "rb") as f:
@@ -48,6 +49,7 @@ with tf.Session(graph=graph, config=config) as sess:
         img = cv2.imread(os.path.join(images_dir, file))
         print(file)
         embed = sess.run(output, feed_dict={input: preprocess_img(img), phase_train_placeholder: False})
+        embed=normalize(embed)
         embed=embed.reshape((512,))
         print(embed.shape)
         print(embed[0:10])
