@@ -414,7 +414,7 @@ import numpy as np
 import tensorflow as tf
 import pdb
 import tfutil
-import identity_predicition.face_model
+import identity_prediction.facenet
 import cv2
 import misc
 #----------------------------------------------------------------------------
@@ -441,12 +441,10 @@ def G_wgan_acgan(G, D, opt, training_set, minibatch_size,
     # Output: Images [minibatch, channel, height, width].
 
     identity_logits=[]
-    model = identity_predicition.face_model.FaceModel(opt)
+    model = identity_predicition.facenet.FaceNet(opt.model)
     for i in range(np.size(fake_images_out,0)):
         misc.save_image(fake_images_out[i], 'tmp.jpg')
-        img = cv2.resize(cv2.imread('tmp.jpg'), (112, 112))
-        img = model.get_input(img)
-        f = model.get_feature(img)
+        f = model.predict('tmp.jpg')
         identity_logits.append(f)
 
     identity_logits = np.array(identity_logits, dtype=np.float32)

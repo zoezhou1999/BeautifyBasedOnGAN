@@ -423,7 +423,7 @@ import PIL.Image
 
 import config
 import dataset
-import legacy
+
 from random import gauss
 
 #----------------------------------------------------------------------------
@@ -431,6 +431,7 @@ from random import gauss
 # older versions of the code.
 
 def load_pkl(filename):
+    import legacy
     with open(filename, 'rb') as file:
         return legacy.LegacyUnpickler(file, encoding='latin1').load()
 
