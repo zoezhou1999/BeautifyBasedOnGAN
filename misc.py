@@ -661,7 +661,8 @@ def make_rand_labels(num_latents, dims, dtype = None, subdims = 512):
     beauty_rates_vectors = np.zeros([num_latents, dims - subdims], dtype=dtype)
     id_vectors = np.array(id_vectors, dtype=dtype)
     combined_vectors = np.hstack((beauty_rates_vectors, id_vectors))
-
+    print("make_rand_labels:combined_vectors.shape:")
+    print(combined_vectors.shape)
     return combined_vectors
 
 def random_latents(num_latents, G, random_state=None):

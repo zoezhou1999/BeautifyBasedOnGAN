@@ -768,7 +768,7 @@ def D_paper(
             
             # pad the labels to convert shape of (?, 1, number_of_means) to (?, 1, resolution, resolution)
             iter_res = 2 ** (res - 1)
-            delta_x = int((iter_res - number_of_means)/2) # number of zeros to add on sides
+            delta_x = int((iter_res - number_of_means_beauty_rates)/2) # number of zeros to add on sides
             delta_y = int(iter_res / 2) # number of zeros to add upwards and downwards
             pad_matrix = tf.constant([[0,0],[delta_y-1, delta_y], [delta_x, delta_x]], dtype='int32')
             means_in = tf.pad(means_tensor, pad_matrix, "CONSTANT") # (?, 1, number_of_means) => (?, iter_res, iter_res)
@@ -787,7 +787,7 @@ def D_paper(
         def grow(res, lod):
             
             # pad the labels to convert shape of (?, 1, number_of_means) to (?, 1, 2**res, 2**res)
-            delta_x = int((2**res - number_of_means)/2) # number of zeros to add on sides
+            delta_x = int((2**res - number_of_means_beauty_rates)/2) # number of zeros to add on sides
             delta_y = int(2**res / 2) # number of zeros to add upwards and downwards
             pad_matrix = tf.constant([[0,0],[delta_y-1, delta_y], [delta_x, delta_x]], dtype='int32')
             means_in = tf.pad(means_tensor, pad_matrix, "CONSTANT") # (?, 1, number_of_means) => (?, 2**res, 2**res)
@@ -804,7 +804,7 @@ def D_paper(
             
             if res > 2: 
                 # pad the labels to convert shape of (?, 1, number_of_means) to (?, 1, 2**(res-1), 2**(res-1))
-                delta_x = int((2**(res-1) - number_of_means)/2) # number of zeros to add on sides
+                delta_x = int((2**(res-1) - number_of_means_beauty_rates)/2) # number of zeros to add on sides
                 delta_y = int(2**(res-1) / 2) # number of zeros to add upwards and downwards
                 pad_matrix = tf.constant([[0,0],[delta_y-1, delta_y], [delta_x, delta_x]], dtype='int32')
                 means_in = tf.pad(means_tensor, pad_matrix, "CONSTANT") # (?, 1, number_of_means) => (?, 2**(res-1), 2**(res-1))
