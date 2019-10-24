@@ -446,13 +446,14 @@ dataset     = EasyDict()                                    # Options for datase
 train       = EasyDict(func='train.train_progressive_gan')  # Options for main training func.
 G           = EasyDict(func='networks.G_paper')             # Options for generator network.
 D           = EasyDict(func='networks.D_paper')             # Options for discriminator network.
-G_opt       = EasyDict(beta1=0.0, beta2=0.99, epsilon=1e-8, model='./identity_prediction/models/20180402-114759/20180402-114759.pb') # Options for generator optimizer and arcFace model.
+G_opt       = EasyDict(beta1=0.0, beta2=0.99, epsilon=1e-8) # Options for generator optimizer and arcFace model.
 D_opt       = EasyDict(beta1=0.0, beta2=0.99, epsilon=1e-8) # Options for discriminator optimizer.
 G_loss      = EasyDict(func='loss.G_wgan_acgan')            # Options for generator loss.
 D_loss      = EasyDict(func='loss.D_wgangp_acgan')          # Options for discriminator loss.
 sched       = EasyDict()                                    # Options for train.TrainingSchedule.
 grid        = EasyDict(size='1080p', layout='random')       # Options for train.setup_snapshot_image_grid().
 
+model = EasyDict(model_path='./identity_prediction/models/20180402-114759/20180402-114759.pb')
 # Dataset (choose one).
 #desc += '-celebahq';            dataset = EasyDict(tfrecord_dir='celebahq/Img/img_celeba/tf_files'); train.mirror_augment = True
 #desc += '-ffhq';            dataset = EasyDict(tfrecord_dir='ffhq128x128/tf_files'); train.mirror_augment = True

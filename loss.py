@@ -419,6 +419,7 @@ sys.path.append("./identity_prediction/")
 import facenet
 import cv2
 import misc
+import config
 #----------------------------------------------------------------------------
 # Convenience func that casts all of its arguments to tf.float32.
 
@@ -443,7 +444,7 @@ def G_wgan_acgan(G, D, opt, training_set, minibatch_size,
     # Output: Images [minibatch, channel, height, width].
 
     identity_logits=[]
-    model = facenet.FaceNet(opt.model)
+    model = facenet.FaceNet(config.model.model_path)
     for i in range(np.size(fake_images_out,0)):
         misc.save_image(fake_images_out[i], 'tmp.png')
         f = model.predict('tmp.png')
