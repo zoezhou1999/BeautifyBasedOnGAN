@@ -440,9 +440,9 @@ def G_wgan_acgan(G, D, opt, training_set, minibatch_size,
 
     # tf.enable_eager_execution()
     # sess = tf.Session()
-    # narray_latents = None
-    # narray_labels = None
-    # int_minibatch_size = None
+    narray_latents = None
+    narray_labels = None
+    int_minibatch_size = None
     # with sess.as_default():
     #     assert tf.get_default_session() is sess
     #     # convert tensor to numpy array
@@ -451,8 +451,9 @@ def G_wgan_acgan(G, D, opt, training_set, minibatch_size,
     #     int_minibatch_size = narray_latents.shape[0]
     #     print("int_minibatch_size")
     #     print(int_minibatch_size)
-    narray_latents = latents.eval(session=tf.get_default_session())
-    narray_labels = labels.eval(session=tf.get_default_session())
+    with tf.Session() as sess:
+        narray_latents = latents.eval()
+        narray_labels = labels.eval()
     int_minibatch_size = narray_latents.shape[0]
     # tf.disable_eager_execution()
     narray_fake_images_out = G.run(narray_latents, narray_labels, minibatch_size=int_minibatch_size)
