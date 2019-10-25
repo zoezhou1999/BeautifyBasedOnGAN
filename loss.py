@@ -437,26 +437,36 @@ def G_wgan_acgan(G, D, opt, training_set, minibatch_size,
 
     latents = tf.random_normal([minibatch_size] + G.input_shapes[0][1:])
     labels = training_set.get_random_labels_tf(minibatch_size)
+
+    tf.InteractiveSession()
+    # convert tensor to numpy array
+    narray_latents = latents.eval()
+    narray_labels = labels.eval()
+    int_minibatch_size = narray_latents.shape[0]
+    print("int_minibatch_size")
+    print(int_minibatch_size)
+    narray_fake_images_out = G.run(narray_latents, narray_labels, minibatch_size=int_minibatch_size)
+
+
     fake_images_out = G.get_output_for(latents, labels, is_training=True)
     fake_scores_out, fake_labels_out = fp32(D.get_output_for(fake_images_out, labels, is_training=True))
     loss = -fake_scores_out
 
-    # Output: Images [minibatch, channel, height, width].
-
+    # predict id feature
     identity_logits=[]
     model = facenet.FaceNet(config.model.model_path)
-    print("minibatch_size")
-    print(minibatch_size)
-    print(minibatch_size.eval()[0])
-    for i in range(minibatch_size.eval()[0]):
-        misc.save_image(fake_images_out[i], 'tmp.png')
+    for i in range(int_minibatch_size):
+        misc.save_image(narray_fake_images_out[i], 'tmp.png')
         f = model.predict('tmp.png')
         identity_logits.append(f)
 
     identity_logits = np.array(identity_logits, dtype=np.float32)
+    # convert numpy array to tensor
+    identity_logits = tf.convert_to_tensor(identity_logits, np.float32)
     identity_labels = labels[:, np.size(labels,1)-id_label_size : np.size(labels, 1)]
+    # calculate the loss of identity
     identity_loss = tf.reduce_mean(tf.nn.sparse_softmax_cross_entropy_with_logits(identity_logits, identity_labels))
-
+    # add id loss
     loss += id_weight * identity_loss
 
     """
