@@ -438,7 +438,7 @@ def G_wgan_acgan(G, D, opt, training_set, minibatch_size,
     latents = tf.random_normal([minibatch_size] + G.input_shapes[0][1:])
     labels = training_set.get_random_labels_tf(minibatch_size)
 
-    tf.enable_eager_execution()
+    # tf.enable_eager_execution()
     # sess = tf.Session()
     # narray_latents = None
     # narray_labels = None
@@ -451,10 +451,10 @@ def G_wgan_acgan(G, D, opt, training_set, minibatch_size,
     #     int_minibatch_size = narray_latents.shape[0]
     #     print("int_minibatch_size")
     #     print(int_minibatch_size)
-    narray_latents = latents.numpy()
-    narray_labels = labels.numpy()
+    narray_latents = latents.eval(session=tf.get_default_session())
+    narray_labels = labels.eval(session=tf.get_default_session())
     int_minibatch_size = narray_latents.shape[0]
-    tf.disable_eager_execution()
+    # tf.disable_eager_execution()
     narray_fake_images_out = G.run(narray_latents, narray_labels, minibatch_size=int_minibatch_size)
 
     fake_images_out = G.get_output_for(latents, labels, is_training=True)
