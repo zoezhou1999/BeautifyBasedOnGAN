@@ -25,9 +25,9 @@ class FaceNet():
             graph_def = tf.GraphDef()
             graph_def.ParseFromString(f.read())
         with tf.Graph().as_default() as graph:
-            tf.import_graph_def(graph_def, input_map=input_map, name='')
+            tf.import_graph_def(graph_def, input_map=input_map, name='net')
             # Get output tensor
-            embeddings = graph.get_tensor_by_name("embeddings:0")
+            embeddings = graph.get_tensor_by_name("net/embeddings:0")
             print('embeddings.shape:')
             print(embeddings.shape)
             return tf.math.l2_normalize(embeddings)
