@@ -440,9 +440,9 @@ def G_wgan_acgan(G, D, opt, training_set, minibatch_size,
 
     # tf.enable_eager_execution()
     # sess = tf.Session()
-    narray_latents = None
-    narray_labels = None
-    int_minibatch_size = None
+    # narray_latents = None
+    # narray_labels = None
+    # int_minibatch_size = None
     # with sess.as_default():
     #     assert tf.get_default_session() is sess
     #     # convert tensor to numpy array
@@ -451,10 +451,10 @@ def G_wgan_acgan(G, D, opt, training_set, minibatch_size,
     #     int_minibatch_size = narray_latents.shape[0]
     #     print("int_minibatch_size")
     #     print(int_minibatch_size)
-    with tf.Session() as sess:
-        narray_latents = latents.eval()
-        narray_labels = labels.eval()
-    int_minibatch_size = narray_latents.shape[0]
+    # with tf.Session() as sess:
+    #     narray_latents = latents.eval()
+    #     narray_labels = labels.eval()
+    # int_minibatch_size = narray_latents.shape[0]
     # tf.disable_eager_execution()
     narray_fake_images_out = G.run(narray_latents, narray_labels, minibatch_size=int_minibatch_size)
 
@@ -463,16 +463,20 @@ def G_wgan_acgan(G, D, opt, training_set, minibatch_size,
     loss = -fake_scores_out
 
     # predict id feature
-    identity_logits=[]
-    model = facenet.FaceNet(config.model.model_path)
-    for i in range(int_minibatch_size):
-        misc.save_image(narray_fake_images_out[i], 'tmp.png')
-        f = model.predict('tmp.png')
-        identity_logits.append(f)
+    # identity_logits=[]
 
-    identity_logits = np.array(identity_logits, dtype=np.float32)
-    # convert numpy array to tensor
-    identity_logits = tf.convert_to_tensor(identity_logits, np.float32)
+    model = facenet.FaceNet(config.model.model_path)
+    identity_logits=model.predict(fake_images_out)
+
+    # for i in range(int_minibatch_size):
+    #     misc.save_image(narray_fake_images_out[i], 'tmp.png')
+    #     f = model.predict('tmp.png')
+    #     identity_logits.append(f)
+    #
+    # identity_logits = np.array(identity_logits, dtype=np.float32)
+    # # convert numpy array to tensor
+    # identity_logits = tf.convert_to_tensor(identity_logits, np.float32)
+
     identity_labels = labels[:, np.size(labels,1)-id_label_size : np.size(labels, 1)]
     # calculate the loss of identity
     identity_loss = tf.reduce_mean(tf.nn.sparse_softmax_cross_entropy_with_logits(identity_logits, identity_labels))
