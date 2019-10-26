@@ -456,7 +456,7 @@ def G_wgan_acgan(G, D, opt, training_set, minibatch_size,
     #     narray_labels = labels.eval()
     # int_minibatch_size = narray_latents.shape[0]
     # tf.disable_eager_execution()
-    narray_fake_images_out = G.run(narray_latents, narray_labels, minibatch_size=int_minibatch_size)
+    # narray_fake_images_out = G.run(narray_latents, narray_labels, minibatch_size=int_minibatch_size)
 
     fake_images_out = G.get_output_for(latents, labels, is_training=True)
     fake_scores_out, fake_labels_out = fp32(D.get_output_for(fake_images_out, labels, is_training=True))
