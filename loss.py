@@ -481,7 +481,7 @@ def G_wgan_acgan(G, D, opt, training_set, minibatch_size,
     # calculate the loss of identity
     ###ValueError: Only call `sparse_softmax_cross_entropy_with_logits` with named arguments (labels=..., logits=..., ...)
 
-    identity_loss = tf.reduce_mean(tf.nn.sparse_softmax_cross_entropy_with_logits(logits=identity_logits, labels=identity_labels))
+    identity_loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=identity_logits, labels=identity_labels))
     # add id loss
     loss += id_weight * identity_loss
 
