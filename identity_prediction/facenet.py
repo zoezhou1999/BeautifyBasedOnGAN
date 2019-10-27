@@ -20,17 +20,19 @@ class FaceNet():
         input_batch=tf.transpose(input_batch, [0, 2, 3, 1])
         input_batch=tf.image.resize(input_batch,(160,160))
         input_batch=(tf.cast(input_batch, tf.float32) - 127.5) / 128.0
-        input_map = {'image_batch': input_batch, 'phase_train': False}
         with tf.gfile.GFile(self.model_path, "rb") as f:
             graph_def = tf.GraphDef()
             graph_def.ParseFromString(f.read())
-        with tf.Graph().as_default() as graph:
-            tf.import_graph_def(graph_def, input_map=input_map, name='net')
-            # Get output tensor
-            embeddings = graph.get_tensor_by_name("net/embeddings:0")
-            print('embeddings.shape:')
-            print(embeddings.shape)
-            return tf.math.l2_normalize(embeddings)
+        embeddings = tf.math.l2_normalize(tf.import_graph_def(graph_def, input_map={'image_batch': input_batch, 'phase_train': False}, return_elements=['net/embeddings:0'], name='net'))
+        # Get output tensor
+        # embeddings = graph.get_tensor_by_name("net/embeddings:0")
+        print('embeddings.shape:')
+        print(embeddings.shape)
+        return embeddings
+        
+        #
+        # with tf.Graph().as_default() as graph:
+
 
     # config = tf.ConfigProto(allow_soft_placement=True, log_device_placement=True)
     # config.gpu_options.allow_growth = True
