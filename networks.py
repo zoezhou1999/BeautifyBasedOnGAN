@@ -725,24 +725,29 @@ def D_paper(
     # get 128 vectors of 4 values(128x128);get 64 vectors of 8 values(64x64);get 32 vectors of 16 values(32x32)
     # get 16 vectors of 32 values(16x16);get 8 vectors of 64 values(8x8);get 4 vectors of 128 values(4x4)
     def downscale_id_features(number_of_means, resolution):
-        # split the id features vector into a few vectors
-        splited_id_features = tf.split(id_features_labels_in, number_of_means * [int(id_label_size / number_of_means)], 1)
+        with tf.device("/cpu:0"):
+            # split the id features vector into a few vectors
+            splited_id_features = tf.split(id_features_labels_in,
+                                           number_of_means * [int(id_label_size / number_of_means)], 1)
 
-        # calcute mean of each vector, splited_id_features will be a list of single mean tensors
-        for i in range(number_of_means):
-            splited_id_features[i] = tf.expand_dims(splited_id_features[i], 1)  # (?, id_label_size/number_of_means) => (?, 1, id_label_size/number_of_means)
-            splited_id_features[i] = tf.reduce_mean(splited_id_features[i], 2)  # (?, 1, id_label_size/number_of_means) => (?, 1)
+            # calcute mean of each vector, splited_id_features will be a list of single mean tensors
+            for i in range(number_of_means):
+                splited_id_features[i] = tf.expand_dims(splited_id_features[i],
+                                                        1)  # (?, id_label_size/number_of_means) => (?, 1, id_label_size/number_of_means)
+                splited_id_features[i] = tf.reduce_mean(splited_id_features[i],
+                                                        2)  # (?, 1, id_label_size/number_of_means) => (?, 1)
 
-        # concatenate all means tensors into one tensor, so it will get a shape of (?, number_of_means)
-        means_tensor = tf.concat(splited_id_features, 1)
-        means_tensor = tf.expand_dims(means_tensor, 1)  # (?, number_of_means) => (?, 1, number_of_means)
+            # concatenate all means tensors into one tensor, so it will get a shape of (?, number_of_means)
+            means_tensor = tf.concat(splited_id_features, 1)
+            means_tensor = tf.expand_dims(means_tensor, 1)  # (?, number_of_means) => (?, 1, number_of_means)
 
-        # pad the id features labels to convert shape of (?, 1, number_of_means) to (?, 1, resolution, resolution)
-        delta_x = int((resolution - number_of_means) / 2)  # number of zeros to add on sides
-        delta_y = int(resolution / 2)  # number of zeros to add upwards and downwards
-        pad_matrix = tf.constant([[0, 0], [delta_y - 1, delta_y], [delta_x, delta_x]], dtype='int32')
-        means_in = tf.pad(means_tensor, pad_matrix, "CONSTANT")  # (?, 1, number_of_means) => (?, resolution, resolution)
-        means_in = tf.expand_dims(means_in, 1)  # (?, resolution, resolution) => (?, 1, resolution, resolution)
+            # pad the id features labels to convert shape of (?, 1, number_of_means) to (?, 1, resolution, resolution)
+            delta_x = int((resolution - number_of_means) / 2)  # number of zeros to add on sides
+            delta_y = int(resolution / 2)  # number of zeros to add upwards and downwards
+            pad_matrix = tf.constant([[0, 0], [delta_y - 1, delta_y], [delta_x, delta_x]], dtype='int32')
+            means_in = tf.pad(means_tensor, pad_matrix,
+                              "CONSTANT")  # (?, 1, number_of_means) => (?, resolution, resolution)
+            means_in = tf.expand_dims(means_in, 1)  # (?, resolution, resolution) => (?, 1, resolution, resolution)
 
         return means_in
 
