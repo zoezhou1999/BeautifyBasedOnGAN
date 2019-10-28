@@ -24,9 +24,9 @@ class FaceNet():
             with tf.gfile.GFile(self.model_path, "rb") as f:
                 graph_def = tf.GraphDef()
                 graph_def.ParseFromString(f.read())
-            embeddings = tf.math.l2_normalize(
+            embeddings = tf.cast(tf.math.l2_normalize(
                 tf.import_graph_def(graph_def, input_map={'image_batch': input_batch, 'phase_train': False},
-                                    return_elements=['embeddings:0'], name='net'), dim=1)
+                                    return_elements=['embeddings:0'], name='net'), dim=1),tf.float32)
             # Get output tensor
             # embeddings = graph.get_tensor_by_name("net/embeddings:0")
             print('embeddings.shape:')
