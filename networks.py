@@ -509,6 +509,15 @@ def downscale2d(x, factor=2):
         return tf.nn.avg_pool(x, ksize=ksize, strides=ksize, padding='VALID', data_format='NCHW') # NOTE: requires tf_config['graph_options.place_pruned_graph'] = True
 
 #----------------------------------------------------------------------------
+# Box filter downscaling layer.
+def downscale2d_id(means_in_id, factor=2):
+    assert isinstance(factor, int) and factor >= 1
+    if factor == 1: return means_in_id
+    with tf.variable_scope('Downscale2D_id'):
+        ksize = [1, 1, factor, factor]
+        return tf.nn.avg_pool(means_in_id, ksize=ksize, strides=ksize, padding='VALID', data_format='NCHW') # NOTE: requires tf_config['graph_options.place_pruned_graph'] = True
+
+#----------------------------------------------------------------------------
 # Fused conv2d + downscale2d.
 # Faster and uses less memory than performing the operations separately.
 
@@ -721,35 +730,52 @@ def D_paper(
     means_tensor = tf.concat(splited_beauty_rates, 1)
     means_tensor = tf.expand_dims(means_tensor, 1) # (?, number_of_means) => (?, 1, number_of_means)
 
+    number_of_means=128
+    # split the id features vector into a few vectors
+    splited_id_features = tf.split(id_features_labels_in,
+                                   number_of_means * [int(id_label_size / number_of_means)], 1)
+
+    # calcute mean of each vector, splited_id_features will be a list of single mean tensors
+    for i in range(number_of_means):
+        splited_id_features[i] = tf.expand_dims(splited_id_features[i],
+                                                1)  # (?, id_label_size/number_of_means) => (?, 1, id_label_size/number_of_means)
+        splited_id_features[i] = tf.reduce_mean(splited_id_features[i],
+                                                2)  # (?, 1, id_label_size/number_of_means) => (?, 1)
+
+    # concatenate all means tensors into one tensor, so it will get a shape of (?, number_of_means)
+    means_tensor_id = tf.concat(splited_id_features, 1)
+    means_tensor_id = tf.expand_dims(means_tensor_id, 1)  # (?, number_of_means) => (?, 1, number_of_means)
+
+
     # create a vector of means from id features vector
     # get 128 vectors of 4 values(128x128);get 64 vectors of 8 values(64x64);get 32 vectors of 16 values(32x32)
     # get 16 vectors of 32 values(16x16);get 8 vectors of 64 values(8x8);get 4 vectors of 128 values(4x4)
-    def downscale_id_features(number_of_means, resolution):
-        with tf.device("/cpu:0"):
-            # split the id features vector into a few vectors
-            splited_id_features = tf.split(id_features_labels_in,
-                                           number_of_means * [int(id_label_size / number_of_means)], 1)
-
-            # calcute mean of each vector, splited_id_features will be a list of single mean tensors
-            for i in range(number_of_means):
-                splited_id_features[i] = tf.expand_dims(splited_id_features[i],
-                                                        1)  # (?, id_label_size/number_of_means) => (?, 1, id_label_size/number_of_means)
-                splited_id_features[i] = tf.reduce_mean(splited_id_features[i],
-                                                        2)  # (?, 1, id_label_size/number_of_means) => (?, 1)
-
-            # concatenate all means tensors into one tensor, so it will get a shape of (?, number_of_means)
-            means_tensor = tf.concat(splited_id_features, 1)
-            means_tensor = tf.expand_dims(means_tensor, 1)  # (?, number_of_means) => (?, 1, number_of_means)
-
-            # pad the id features labels to convert shape of (?, 1, number_of_means) to (?, 1, resolution, resolution)
-            delta_x = int((resolution - number_of_means) / 2)  # number of zeros to add on sides
-            delta_y = int(resolution / 2)  # number of zeros to add upwards and downwards
-            pad_matrix = tf.constant([[0, 0], [delta_y - 1, delta_y], [delta_x, delta_x]], dtype='int32')
-            means_in = tf.pad(means_tensor, pad_matrix,
-                              "CONSTANT")  # (?, 1, number_of_means) => (?, resolution, resolution)
-            means_in = tf.expand_dims(means_in, 1)  # (?, resolution, resolution) => (?, 1, resolution, resolution)
-
-        return means_in
+    # def downscale_id_features(number_of_means, resolution):
+    #     with tf.device("/cpu:0"):
+    #         # split the id features vector into a few vectors
+    #         splited_id_features = tf.split(id_features_labels_in,
+    #                                        number_of_means * [int(id_label_size / number_of_means)], 1)
+    #
+    #         # calcute mean of each vector, splited_id_features will be a list of single mean tensors
+    #         for i in range(number_of_means):
+    #             splited_id_features[i] = tf.expand_dims(splited_id_features[i],
+    #                                                     1)  # (?, id_label_size/number_of_means) => (?, 1, id_label_size/number_of_means)
+    #             splited_id_features[i] = tf.reduce_mean(splited_id_features[i],
+    #                                                     2)  # (?, 1, id_label_size/number_of_means) => (?, 1)
+    #
+    #         # concatenate all means tensors into one tensor, so it will get a shape of (?, number_of_means)
+    #         means_tensor = tf.concat(splited_id_features, 1)
+    #         means_tensor = tf.expand_dims(means_tensor, 1)  # (?, number_of_means) => (?, 1, number_of_means)
+    #
+    #         # pad the id features labels to convert shape of (?, 1, number_of_means) to (?, 1, resolution, resolution)
+    #         delta_x = int((resolution - number_of_means) / 2)  # number of zeros to add on sides
+    #         delta_y = int(resolution / 2)  # number of zeros to add upwards and downwards
+    #         pad_matrix = tf.constant([[0, 0], [delta_y - 1, delta_y], [delta_x, delta_x]], dtype='int32')
+    #         means_in = tf.pad(means_tensor, pad_matrix,
+    #                           "CONSTANT")  # (?, 1, number_of_means) => (?, resolution, resolution)
+    #         means_in = tf.expand_dims(means_in, 1)  # (?, resolution, resolution) => (?, 1, resolution, resolution)
+    #
+    #     return means_in
 
     # Linear structure: simple but inefficient.
     if structure == 'linear':
@@ -761,15 +787,25 @@ def D_paper(
         pad_matrix = tf.constant([[0,0],[delta_y-1, delta_y], [delta_x, delta_x]], dtype='int32')
         means_in = tf.pad(means_tensor, pad_matrix, "CONSTANT") # (?, 1, number_of_means) => (?, resolution, resolution)
         means_in = tf.expand_dims(means_in, 1) # (?, resolution, resolution) => (?, 1, resolution, resolution)
-        id_features_means_in = downscale_id_features(128,128)
+
+        # id_features_means_in = downscale_id_features(128,128)
+
+        # pad the id features labels to convert shape of (?, 1, number_of_means) to (?, 1, resolution, resolution)
+        delta_x = int((resolution - number_of_means) / 2)  # number of zeros to add on sides
+        delta_y = int(resolution / 2)  # number of zeros to add upwards and downwards
+        pad_matrix = tf.constant([[0, 0], [delta_y - 1, delta_y], [delta_x, delta_x]], dtype='int32')
+        means_in_id = tf.pad(means_tensor_id, pad_matrix,
+                          "CONSTANT")  # (?, 1, number_of_means) => (?, resolution, resolution)
+        means_in_id = tf.expand_dims(means_in_id, 1)  # (?, resolution, resolution) => (?, 1, resolution, resolution)
 
         # concatenate images to means
-        input_in = tf.concat([images_in, means_in, id_features_means_in], axis=1) # final shape: (?, 4, resolution, resolution)
+        input_in = tf.concat([images_in, means_in, means_in_id], axis=1) # final shape: (?, 4, resolution, resolution)
         x = fromrgb(input_in, resolution_log2)
         for res in range(resolution_log2, 2, -1):
             lod = resolution_log2 - res
             x = block(x, res)
             img = downscale2d(img)
+            means_in_id = downscale2d_id(means_in_id)
             
             # pad the labels to convert shape of (?, 1, number_of_means) to (?, 1, resolution, resolution)
             iter_res = 2 ** (res - 1)
@@ -778,9 +814,11 @@ def D_paper(
             pad_matrix = tf.constant([[0,0],[delta_y-1, delta_y], [delta_x, delta_x]], dtype='int32')
             means_in = tf.pad(means_tensor, pad_matrix, "CONSTANT") # (?, 1, number_of_means) => (?, iter_res, iter_res)
             means_in = tf.expand_dims(means_in, 1) # (?, iter_res, iter_res) => (?, 1, iter_res, iter_res)
-            id_features_means_in = downscale_id_features(iter_res, iter_res)
+
+            # id_features_means_in = downscale_id_features(iter_res, iter_res)
+
             # concatenate images to means
-            input_in = tf.concat([img, means_in, id_features_means_in], axis=1) # final shape: (?, 4, iter_res, iter_res)
+            input_in = tf.concat([img, means_in, means_in_id], axis=1) # final shape: (?, 4, iter_res, iter_res)
             
             y = fromrgb(input_in, res - 1)
             with tf.variable_scope('Grow_lod%d' % lod):
@@ -797,11 +835,11 @@ def D_paper(
             pad_matrix = tf.constant([[0,0],[delta_y-1, delta_y], [delta_x, delta_x]], dtype='int32')
             means_in = tf.pad(means_tensor, pad_matrix, "CONSTANT") # (?, 1, number_of_means) => (?, 2**res, 2**res)
             means_in = tf.expand_dims(means_in, 1) # (?, 2**res, 2**res) => (?, 1, 2**res, 2**res)
-            id_features_means_in = downscale_id_features(2**res, 2**res)
-            
+            # id_features_means_in = downscale_id_features(2**res, 2**res)
+            means_in_id = downscale2d_id(means_in_id, 2**lod)
             # concatenate images to means
             img_downscaled = downscale2d(images_in, 2**lod)
-            input_in = tf.concat([img_downscaled, means_in, id_features_means_in], axis=1) # final shape: (?, 4, 2**res, 2**res)
+            input_in = tf.concat([img_downscaled, means_in, means_in_id], axis=1) # final shape: (?, 4, 2**res, 2**res)
             
             x = lambda: fromrgb(input_in, res)
             if lod > 0: x = cset(x, (lod_in < lod), lambda: grow(res + 1, lod - 1))
@@ -814,11 +852,13 @@ def D_paper(
                 pad_matrix = tf.constant([[0,0],[delta_y-1, delta_y], [delta_x, delta_x]], dtype='int32')
                 means_in = tf.pad(means_tensor, pad_matrix, "CONSTANT") # (?, 1, number_of_means) => (?, 2**(res-1), 2**(res-1))
                 means_in = tf.expand_dims(means_in, 1) # (?, 2**(res-1), 2**(res-1)) => (?, 1, 2**(res-1), 2**(res-1))
-                id_features_means_in = downscale_id_features(2**(res-1), 2**(res-1))
+                # id_features_means_in = downscale_id_features(2**(res-1), 2**(res-1))
+
+                means_in_id = downscale2d_id(means_in_id, 2**(lod+1))
                 
                 # concatenate images to means
                 img_downscaled = downscale2d(images_in, 2**(lod+1))
-                input_in = tf.concat([img_downscaled, means_in, id_features_means_in], axis=1) # final shape: (?, 4, 2**(res-1), 2**(res-1))
+                input_in = tf.concat([img_downscaled, means_in, means_in_id], axis=1) # final shape: (?, 4, 2**(res-1), 2**(res-1))
                 
                 y = cset(y, (lod_in > lod), lambda: lerp(x, fromrgb(input_in, res - 1), lod_in - lod))
             return y()
