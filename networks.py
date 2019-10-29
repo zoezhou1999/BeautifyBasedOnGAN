@@ -838,7 +838,7 @@ def D_paper(
         #                      "CONSTANT")  # (?, 1, number_of_means) => (?, resolution, resolution)
         # means_in_id = tf.expand_dims(means_in_id, 1)  # (?, resolution, resolution) => (?, 1, resolution, resolution)
 
-        def grow(res, lod):
+        def grow(res, lod, means_in_id):
             
             # pad the labels to convert shape of (?, 1, number_of_means) to (?, 1, 2**res, 2**res)
             delta_x = int((2**res - number_of_means_beauty_rates)/2) # number of zeros to add on sides
@@ -857,14 +857,14 @@ def D_paper(
             # means_in_id = tf.expand_dims(means_in_id,
             #                              1)  # (?, resolution, resolution) => (?, 1, resolution, resolution)
 
-            means_in_id = downscale2d_id(means_in_id, 2**lod)
+            means_in_id_downscaled = downscale2d_id(means_in_id, 2**lod)
 
             # concatenate images to means
             img_downscaled = downscale2d(images_in, 2**lod)
-            input_in = tf.concat([img_downscaled, means_in, means_in_id], axis=1) # final shape: (?, 4, 2**res, 2**res)
+            input_in = tf.concat([img_downscaled, means_in, means_in_id_downscaled], axis=1) # final shape: (?, 4, 2**res, 2**res)
             
             x = lambda: fromrgb(input_in, res)
-            if lod > 0: x = cset(x, (lod_in < lod), lambda: grow(res + 1, lod - 1))
+            if lod > 0: x = cset(x, (lod_in < lod), lambda: grow(res + 1, lod - 1, means_in_id))
             x = block(x(), res); y = lambda: x
             
             if res > 2: 
@@ -876,15 +876,15 @@ def D_paper(
                 means_in = tf.expand_dims(means_in, 1) # (?, 2**(res-1), 2**(res-1)) => (?, 1, 2**(res-1), 2**(res-1))
                 # id_features_means_in = downscale_id_features(2**(res-1), 2**(res-1))
 
-                means_in_id = downscale2d_id(means_in_id, 2**(lod+1))
+                means_in_id_downscaled = downscale2d_id(means_in_id, 2**(lod+1))
                 
                 # concatenate images to means
                 img_downscaled = downscale2d(images_in, 2**(lod+1))
-                input_in = tf.concat([img_downscaled, means_in, means_in_id], axis=1) # final shape: (?, 4, 2**(res-1), 2**(res-1))
+                input_in = tf.concat([img_downscaled, means_in, means_in_id_downscaled], axis=1) # final shape: (?, 4, 2**(res-1), 2**(res-1))
                 
                 y = cset(y, (lod_in > lod), lambda: lerp(x, fromrgb(input_in, res - 1), lod_in - lod))
             return y()
-        combo_out = grow(2, resolution_log2 - 2)
+        combo_out = grow(2, resolution_log2 - 2, means_in_id)
 
     assert combo_out.dtype == tf.as_dtype(dtype)
     scores_out = tf.identity(combo_out[:, :1], name='scores_out')
