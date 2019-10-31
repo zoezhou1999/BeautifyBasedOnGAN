@@ -12,10 +12,10 @@ import cv2
 from sklearn.preprocessing import normalize
 
 def load_pb(path_to_pb):
-    with tf.gfile.GFile(path_to_pb, "rb") as f:
-        graph_def = tf.GraphDef()
+    with tf.io.gfile.GFile(path_to_pb, "rb") as f:
+        graph_def = tf.compat.v1.GraphDef()
         graph_def.ParseFromString(f.read())
-    with tf.Graph().as_default() as graph:
+    with tf.compat.v1.Graph().as_default() as graph:
         tf.import_graph_def(graph_def, name='')
         return graph
 
@@ -41,7 +41,7 @@ phase_train_placeholder = graph.get_tensor_by_name("phase_train:0")
 id_features=[]
 images_dir = "{0}/img".format(args.dataset)
 number_of_images = len(os.listdir(images_dir))
-config = tf.ConfigProto(allow_soft_placement=True, log_device_placement=True)
+config = tf.compat.v1.ConfigProto(allow_soft_placement=True, log_device_placement=True)
 config.gpu_options.allow_growth = True
 
 with tf.Session(graph=graph, config=config) as sess:
