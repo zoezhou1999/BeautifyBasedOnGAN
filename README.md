@@ -88,6 +88,11 @@ python execute_beauty_prediction.py --model trained_model/VGG16_beauty_rates.pt 
 
 ```
 python execute_beauty_prediction.py --model trained_model/VGG16_beauty_rates-new.pt --dataset ../datasets/ffhq128x128
+
+nohup python identity_predict.py > idpre.out 2>&1 &
+
+nohup python dataset_tool.py create_from_images_cond_continuous_id datasets/ffhq128x128/tf_files_id datasets/ffhq128x128/img > createffhqid.out 2>&1 &
+
 ```
 This script will reload our trained VGG16 network and predict beauty scores for all images that in ../datasets/CelebA-HQ/img in order to store a predicted All_Ratings.csv in ../datasets/CelebA-HQ.  
   
