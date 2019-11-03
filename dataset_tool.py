@@ -1142,7 +1142,7 @@ def convert_celebahq_to256x256(tfrecord_dir, celeba_dir, delta_dir, num_threads=
     with TFRecordExporter(tfrecord_dir, indices.size) as tfr:
         order = tfr.choose_shuffled_order()
         with ThreadPool(num_threads) as pool:
-            for img in pool.process_items_concurrently(indices[order].tolist(), process_func=process_func, max_items_in_flight=num_tasks):
+            for i, img in enumerate(pool.process_items_concurrently(indices[order].tolist(), process_func=process_func, max_items_in_flight=num_tasks)):
                 tfr.add_image(img)
                 im = np.swapaxes(img, 0, 2)
                 im = PIL.Image.fromarray(im)

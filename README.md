@@ -126,6 +126,8 @@ These are my tried commands.
 ```
 nohup python dataset_tool.py create_from_images_cond_continuous datasets/ffhq128x128/tf_files datasets/ffhq128x128/img > createffhq.out 2>&1 &
 
+nohup python dataset_tool.py convert_celebahq_to256x256 datasets/celebahq/Img/img_celeba/tf_files_noid datasets/celebahq/Img datasets/celebahq/deltas > createcelebahqnoidto256x256.out 2>&1 &
+
 nohup python train.py > trainffhq.out 2>&1 &
 
 ```
