@@ -556,8 +556,8 @@ def train_progressive_gan(
     save_weight_histograms  = False,        # Include weight histograms in the tfevents file?
     resume_run_id           = "results/000-pgan-ffhq_id-cond-preset-v2-1gpu-fp32/network-snapshot-004622.pkl",         # Run ID or network pkl to resume training from, None = start from scratch.
     resume_snapshot         = None,         # Snapshot index to resume training from, None = autodetect.
-    resume_kimg             = 0.0,          # Assumed training progress at the beginning. Affects reporting and training schedule.
-    resume_time             = 0.0):         # Assumed wallclock time at the beginning. Affects reporting.
+    resume_kimg             = 4622.1,          # Assumed training progress at the beginning. Affects reporting and training schedule.
+    resume_time             = 40):         # Assumed wallclock time at the beginning. Affects reporting.
 
     maintenance_start_time = time.time()
     training_set = dataset.load_dataset(data_dir=config.data_dir, verbose=True, **config.dataset)
