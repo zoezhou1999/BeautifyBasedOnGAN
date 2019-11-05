@@ -462,6 +462,9 @@ def G_wgan_acgan(G, D, opt, training_set, minibatch_size,
     fake_scores_out, fake_labels_out = fp32(D.get_output_for(fake_images_out, labels, is_training=True))
     loss = -fake_scores_out
 
+    fake_scores_out = tfutil.autosummary('Loss/fake_scores_out', fake_scores_out)
+    
+
     # predict id feature
     # identity_logits=[]
 
@@ -483,7 +486,9 @@ def G_wgan_acgan(G, D, opt, training_set, minibatch_size,
 
     identity_loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=identity_logits, labels=identity_labels))
     # add id loss
+    identity_loss = tfutil.autosummary('Loss/identity_loss', identity_loss)
     loss += id_weight * identity_loss
+    loss = tfutil.autosummary('Loss/G_loss', loss)
 
     """
     if D.output_shapes[1][1] > 0:
@@ -528,6 +533,8 @@ def D_wgangp_acgan(G, D, opt, training_set, minibatch_size, reals, labels,
     with tf.name_scope('EpsilonPenalty'):
         epsilon_penalty = tfutil.autosummary('Loss/epsilon_penalty', tf.square(real_scores_out))
     loss += epsilon_penalty * wgan_epsilon
+
+    loss = tfutil.autosummary('Loss/D_loss', loss)
 
     """
     if D.output_shapes[1][1] > 0:

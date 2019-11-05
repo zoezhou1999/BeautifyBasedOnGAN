@@ -17,21 +17,21 @@ class FaceNet():
         self.model_path = model_path
 
     def predict(self, input_batch):
-        with tf.device("/cpu:0"):
-            input_batch = tf.transpose(input_batch, [0, 2, 3, 1])
-            input_batch = tf.image.resize(input_batch, (160, 160))
-            input_batch = (tf.cast(input_batch, tf.float32) - 127.5) / 128.0
-            with tf.gfile.GFile(self.model_path, "rb") as f:
-                graph_def = tf.GraphDef()
-                graph_def.ParseFromString(f.read())
-            embeddings = tf.cast(tf.reshape(tf.math.l2_normalize(
+        input_batch = tf.transpose(input_batch, [0, 2, 3, 1])
+        input_batch = tf.image.resize(input_batch, (160, 160))
+        input_batch = (tf.cast(input_batch, tf.float32) - 127.5) / 128.0
+        with tf.gfile.GFile(self.model_path, "rb") as f:
+            graph_def = tf.GraphDef()
+            graph_def.ParseFromString(f.read())
+            
+        embeddings = tf.cast(tf.reshape(tf.math.l2_normalize(
                 tf.import_graph_def(graph_def, input_map={'image_batch': input_batch, 'phase_train': False},
                                     return_elements=['embeddings:0'], name='net'), dim=1),[-1, 512]), tf.float32)
             # Get output tensor
             # embeddings = graph.get_tensor_by_name("net/embeddings:0")
-            print('embeddings.shape:')
-            print(embeddings.shape)
-            return embeddings
+        print('embeddings.shape:')
+        print(embeddings.shape)
+        return embeddings
         #
         # with tf.Graph().as_default() as graph:
 
