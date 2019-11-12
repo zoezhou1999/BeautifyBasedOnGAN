@@ -15,6 +15,43 @@ class FaceNet():
 
     def __init__(self, model_path):
         self.model_path = model_path
+        
+
+    def load_pb(self,path_to_pb):
+        with tf.io.gfile.GFile(path_to_pb, "rb") as f:
+            graph_def = tf.compat.v1.GraphDef()
+            graph_def.ParseFromString(f.read())
+        with tf.compat.v1.Graph().as_default() as graph:
+            tf.import_graph_def(graph_def, name='')
+            return graph
+
+    def preprocess_img(self,x):
+        x = cv2.resize(x, (160, 160))
+        # mean = np.mean(x)
+        # std = np.std(x)
+        # std_adj = np.maximum(std, 1.0/np.sqrt(x.size))
+        # y = np.multiply(np.subtract(x, mean), 1/std_adj)
+        y = (np.float32(x) - 127.5) / 128.0
+        return np.expand_dims(y, 0)
+    
+    def singlePredict(self, image_path):
+
+        graph = self.load_pb(self.model_path)
+        input = graph.get_tensor_by_name('input:0')
+        output = graph.get_tensor_by_name('embeddings:0')
+        phase_train_placeholder = graph.get_tensor_by_name("phase_train:0")
+        config = tf.compat.v1.ConfigProto(allow_soft_placement=True, log_device_placement=True)
+        config.gpu_options.allow_growth = True
+
+        with tf.Session(graph=graph, config=config) as sess:
+            img = cv2.imread(image_path)
+            embed = sess.run(output, feed_dict={input: self.preprocess_img(img), phase_train_placeholder: False})
+            embed=normalize(embed)
+            embed=embed.reshape((1,512))
+            print(embed.shape)
+            print(embed[0:10])
+            return np.array(embed, dtype=np.float32)
+
 
     def predict(self, input_batch):
         input_batch = tf.transpose(input_batch, [0, 2, 3, 1])

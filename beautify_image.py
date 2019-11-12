@@ -11,6 +11,7 @@ import tensorflow_hub as hub
 import PIL
 from PIL import Image
 import matplotlib.pyplot as plt
+from identity_prediction import facenet
 
 # initialize parser arguments
 parser = argparse.ArgumentParser()
@@ -48,6 +49,9 @@ G, D, Gs = misc.load_network_pkl(args.results_dir, None)
 # initiate random input
 latents = misc.random_latents(1, Gs, random_state=np.random.RandomState(800))
 labels = np.random.rand(1, args.labels_size)
+model=facenet.FaceNet('./identity_prediction/models/20180402-114759/20180402-114759.pb')
+features=model.singlePredict(args.image_path)
+labels=np.hstack([labels,features]).astype(np.float32)
 
 # upload image and convert to input tensor
 img = PIL.Image.open(args.image_path)

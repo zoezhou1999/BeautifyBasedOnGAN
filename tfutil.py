@@ -1307,9 +1307,20 @@ class Network:
         labels_name = self.input_templates[1].name
         input_labels = tf.get_default_graph().get_tensor_by_name(labels_name)
         
+        print("input_labels shape")
+        print(input_labels.get_shape().as_list())
+        beauty_scores_len=input_labels.get_shape().as_list()[1]-512
+        mask = np.hstack(np.ones((beauty_scores_len,)),np.zeros((512,))).astype(np.float32)
+
+        def entry_stop_gradients(target, mask):
+            mask_h = tf.abs(mask-1)
+            return tf.stop_gradient(mask_h * target) + mask * target
+        
         # Gradients computation
         latents_gradient = tf.gradients(loss, input_latents)
+        input_labels=entry_stop_gradients(input_labels, tf.expand_dims(mask,1))
         labels_gradient = tf.gradients(loss, input_labels)
+
         gradient = tf.concat([latents_gradient, labels_gradient], 2)
         
         # We modify existing template to feed etalons
@@ -1345,7 +1356,7 @@ class Network:
             g_labels = np.expand_dims(g[1][0][0][512:], 0)
 
             latents = latents - l_rate * g_latents
-            labels = labels - l_rate * g_labels
+            labels[:,labels.shape[1]-512] = labels[:,labels.shape[1]-512] - l_rate * g_labels[:,labels.shape[1]-512]
 
             # Standard clipping
             if stohastic_clipping:
@@ -1361,8 +1372,8 @@ class Network:
                         rand_el2 = np.random.uniform(-1, 1, size=(1, edge2.shape[0]))
                         latents[j, edge2] = rand_el2
 
-                    edge1 = np.where(labels[j] > 1.)[0]
-                    edge2 = np.where(labels[j] < 0.)[0]
+                    edge1 = np.where(labels[j][:,labels[j].shape[1]-512] > 1.)[0]
+                    edge2 = np.where(labels[j][:,labels[j].shape[1]-512] < 0.)[0]
                     if edge1.shape[0] > 0:
                         rand_el1 = np.random.uniform(-1, 1, size=(1, edge1.shape[0]))
                         labels[j, edge1] = rand_el1
@@ -1371,7 +1382,7 @@ class Network:
                         labels[j, edge2] = rand_el2
             else:
                 latents = np.clip(latents, -1, 1)
-                labels = np.clip(labels, 0, 1)
+                labels[:,labels.shape[1]-512] = np.clip(labels[:,labels.shape[1]-512], 0, 1)
 
             # Udating the dictionary for next itteration.
             feed_dict[input_latents] = latents
