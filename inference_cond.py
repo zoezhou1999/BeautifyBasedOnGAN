@@ -6,6 +6,8 @@ from config import EasyDict
 import tfutil
 import argparse
 
+from random import gauss
+
 # initialize parser arguments
 parser = argparse.ArgumentParser()
 parser.add_argument('--results_dir', '-results_dir', help='name of training experiment folder', default='dean_cond_batch16', type=str)
@@ -53,9 +55,15 @@ for j in range(args.outputs):
             # initiate conditioned label
             labels = np.zeros([1, args.labels_size], np.float32)
             labels[0][i] = 1.0
+
+            vector = [gauss(0, 1) for j in range(512)]
+            mag = sum(x ** 2 for x in vector) ** .5
+            id_vectors=[x/mag for x in vector]
+            id_vectors = np.array(id_vectors, dtype=np.float32)
+            combined_labels = np.hstack((labels, id_vectors)).astype(np.float32)
             
             # infer conditioned noise to receive image
-            image = Gs.run(latents, labels, minibatch_size=1, num_gpus=1, out_mul=127.5, out_add=127.5, out_shrink=1, out_dtype=np.uint8)
+            image = Gs.run(latents, combined_labels, minibatch_size=1, num_gpus=1, out_mul=127.5, out_add=127.5, out_shrink=1, out_dtype=np.uint8)
             #image = Gs.run(latents, labels, minibatch_size=1, num_gpus=0, out_mul=127.5, out_add=127.5, out_shrink=1, out_dtype=np.uint8)
             
             # save generated image as 'i.png' and noise vector as noise_vector.txt
@@ -80,8 +88,14 @@ for j in range(args.outputs):
                 labels = np.random.normal(min_beauty_level*(i+1), std, [1, args.labels_size])
                 labels = np.clip(labels, 0.0, 1.0)
             
+            vector = [gauss(0, 1) for j in range(512)]
+            mag = sum(x ** 2 for x in vector) ** .5
+            id_vectors=[x/mag for x in vector]
+            id_vectors = np.array(id_vectors, dtype=np.float32)
+            combined_labels = np.hstack((labels, id_vectors)).astype(np.float32)
+
             # infer conditioned noise to receive image
-            image = Gs.run(latents, labels, minibatch_size=1, num_gpus=1, out_mul=127.5, out_add=127.5, out_shrink=1, out_dtype=np.uint8)
+            image = Gs.run(latents, combined_labels, minibatch_size=1, num_gpus=1, out_mul=127.5, out_add=127.5, out_shrink=1, out_dtype=np.uint8)
             #image = Gs.run(latents, labels, minibatch_size=1, num_gpus=0, out_mul=127.5, out_add=127.5, out_shrink=1, out_dtype=np.uint8)
             
             # save generated image as 'i.png' and noise vector as noise_vector.txt
