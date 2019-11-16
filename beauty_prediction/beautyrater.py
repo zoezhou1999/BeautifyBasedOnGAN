@@ -49,7 +49,7 @@ class BeautyRater:
         self.vgg16.to(device)
 
         # upload pretrained weights from beauty labeled dataset
-        self.vgg16.load_state_dict(torch.load(opt.model))
+        self.vgg16.load_state_dict(torch.load(self.model_path))
         self.vgg16.eval()
 
     def predict(self, img_path):
