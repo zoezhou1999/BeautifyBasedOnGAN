@@ -1404,7 +1404,7 @@ class Network:
                 # Saving the best latents and labels
                 c_min = g[0]
                 x_min = latents
-                y_min = labels[:]
+                # y_min = labels[:]
 
             if i % 50 == 0 and i != 0:
                 # We reduce the learning rate every 50 iterations
@@ -1427,7 +1427,7 @@ class Network:
                 np.save(os.path.join(dest_dir, iteration_name), x_min)
 
                 for k in range(10):
-                    y_pred = y_min[:]
+                    y_pred = labels[:]
                     y_pred[:,0:y_pred.shape[1]-512] = y_pred[:,0:y_pred.shape[1]-512] + (k*0.05)
                     y_pred[:,0:y_pred.shape[1]-512]=np.clip(y_pred[:,0:y_pred.shape[1]-512], 0, 1)
 
