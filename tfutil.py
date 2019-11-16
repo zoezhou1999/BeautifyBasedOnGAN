@@ -1310,6 +1310,7 @@ class Network:
         print("input_labels shape")
         print(input_labels.get_shape().as_list())
         beauty_scores_len=input_labels.get_shape().as_list()[1]-512
+        print(beauty_scores_len)
         mask = np.hstack((np.ones((beauty_scores_len,)),np.zeros((512,)))).astype(np.float32)
 
         def entry_stop_gradients(target, mask):
