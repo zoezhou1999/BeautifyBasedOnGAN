@@ -47,7 +47,7 @@ network_pkl = misc.locate_network_pkl(args.results_dir)
 print('Loading network from "%s"...' % network_pkl)
 G, D, Gs = misc.load_network_pkl(args.results_dir, None)
 
-initiate random input
+# initiate random input
 latents = misc.random_latents(1, Gs, random_state=np.random.RandomState(800))
 # labels = np.random.rand(1, args.labels_size)
 
