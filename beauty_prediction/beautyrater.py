@@ -19,7 +19,7 @@ class BeautyRater:
         cudnn.benchmark = True
 
         # VGG-16 Takes 224x224 images as input
-        transform=transforms.Compose([
+        self.transform=transforms.Compose([
                                     transforms.Pad((pad_x,pad_y)),
                                     transforms.Resize(224),
                                     transforms.CenterCrop(224),
@@ -56,7 +56,7 @@ class BeautyRater:
 
         # open image, transform and upload to gpu
         img = Image.open(img_path)
-        img = transform(img)
+        img = self.transform(img)
         img = torch.from_numpy(np.asarray(img))
         if torch.cuda.is_available():
             with torch.no_grad():
