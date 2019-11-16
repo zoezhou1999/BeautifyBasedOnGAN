@@ -1311,7 +1311,7 @@ class Network:
         print(input_labels.get_shape().as_list())
         beauty_scores_len=input_labels.get_shape().as_list()[1]-512
         print(beauty_scores_len)
-        mask = np.hstack((np.ones((beauty_scores_len,)),np.zeros((512,)))).astype(np.float32)
+        mask = tf.constant(np.hstack((np.ones((beauty_scores_len,)),np.zeros((512,)))).astype(np.float32))
 
         def entry_stop_gradients(target, mask):
             mask_h = tf.abs(mask-1)
@@ -1319,7 +1319,7 @@ class Network:
         
         # Gradients computation
         latents_gradient = tf.gradients(loss, input_latents)
-        input_labels=entry_stop_gradients(input_labels, tf.expand_dims(mask,1))
+        input_labels=entry_stop_gradients(input_labels, tf.expand_dims(mask,0))
         labels_gradient = tf.gradients(loss, input_labels)
 
         gradient = tf.concat([latents_gradient, labels_gradient], 2)
