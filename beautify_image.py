@@ -12,6 +12,7 @@ import PIL
 from PIL import Image
 import matplotlib.pyplot as plt
 from identity_prediction import facenet
+from beauty_prediction import beautyrater
 
 # initialize parser arguments
 parser = argparse.ArgumentParser()
@@ -47,11 +48,15 @@ print('Loading network from "%s"...' % network_pkl)
 G, D, Gs = misc.load_network_pkl(args.results_dir, None)
 
 # initiate random input
-latents = misc.random_latents(1, Gs, random_state=np.random.RandomState(800))
-labels = np.random.rand(1, args.labels_size)
-model=facenet.FaceNet('./identity_prediction/models/20180402-114759/20180402-114759.pb')
-features=model.singlePredict(args.image_path)
-labels=np.hstack([labels,features]).astype(np.float32)
+# latents = misc.random_latents(1, Gs, random_state=np.random.RandomState(800))
+# labels = np.random.rand(1, args.labels_size)
+
+model1=beautyrater.BeautyRater('./beauty_prediction/experiments/train_beauty_vgg/VGG16_beauty_rates-new.pt')
+features1=model1.predict(args.image_path)
+
+model2=facenet.FaceNet('./identity_prediction/models/20180402-114759/20180402-114759.pb')
+features2=model2.singlePredict(args.image_path)
+labels=np.hstack([features1,features2]).astype(np.float32)
 
 # upload image and convert to input tensor
 img = PIL.Image.open(args.image_path)

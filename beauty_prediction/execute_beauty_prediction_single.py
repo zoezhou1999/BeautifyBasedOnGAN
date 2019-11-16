@@ -54,7 +54,7 @@ else:
 vgg16.to(device)
 
 # upload pretrained weights from beauty labeled dataset
-vgg16.load_state_dict(torch.load(opt.model,map_location=torch.device('cpu')),strict=False)
+vgg16.load_state_dict(torch.load(opt.model))
 vgg16.eval()
 
 # open image, transform and upload to gpu
