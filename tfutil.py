@@ -1307,27 +1307,26 @@ class Network:
         labels_name = self.input_templates[1].name
         input_labels = tf.get_default_graph().get_tensor_by_name(labels_name)
         
-        print("input_labels shape")
-        print(input_labels.get_shape().as_list())
-        beauty_scores_len=input_labels.get_shape().as_list()[1]-512
-        print(beauty_scores_len)
-        mask = tf.constant(np.hstack((np.ones((beauty_scores_len,)),np.zeros((512,)))).astype(np.float32))
+        # print("input_labels shape")
+        # print(input_labels.get_shape().as_list())
+        # beauty_scores_len=input_labels.get_shape().as_list()[1]-512
+        # print(beauty_scores_len)
+        # mask = tf.constant(np.hstack((np.ones((beauty_scores_len,)),np.zeros((512,)))).astype(np.float32))
 
-        def entry_stop_gradients(target, mask):
-            mask_h = tf.abs(mask-1)
-            print(mask_h)
-            print(tf.stop_gradient(mask_h * target))
-            print(mask * target)
-            return tf.stop_gradient(mask_h * target) + mask * target
+        # def entry_stop_gradients(target, mask):
+        #     mask_h = tf.abs(mask-1)
+        #     print(mask_h)
+        #     print(tf.stop_gradient(mask_h * target))
+        #     print(mask * target)
+        #     return tf.stop_gradient(mask_h * target) + mask * target
         
         # Gradients computation
         latents_gradient = tf.gradients(loss, input_latents)
-        print(latents_gradient)
+        # print(latents_gradient)
         # input_labels=entry_stop_gradients(input_labels, tf.expand_dims(mask,0))
-        print(input_labels)
+        # print(input_labels)
         labels_gradient = tf.gradients(loss, input_labels)
-        print(labels_gradient)
-
+        # print(labels_gradient)
         gradient = tf.concat([latents_gradient, labels_gradient], 2)
         
         # We modify existing template to feed etalons
@@ -1379,8 +1378,8 @@ class Network:
                         rand_el2 = np.random.uniform(-1, 1, size=(1, edge2.shape[0]))
                         latents[j, edge2] = rand_el2
 
-                    edge1 = np.where(labels[j][:,labels[j].shape[1]-512] > 1.)[0]
-                    edge2 = np.where(labels[j][:,labels[j].shape[1]-512] < 0.)[0]
+                    edge1 = np.where(labels[j, labels.shape[1]-512] > 1.)[0]
+                    edge2 = np.where(labels[j, labels.shape[1]-512] < 0.)[0]
                     if edge1.shape[0] > 0:
                         rand_el1 = np.random.uniform(-1, 1, size=(1, edge1.shape[0]))
                         labels[j, edge1] = rand_el1
