@@ -1320,7 +1320,9 @@ class Network:
         # Gradients computation
         latents_gradient = tf.gradients(loss, input_latents)
         input_labels=entry_stop_gradients(input_labels, tf.expand_dims(mask,0))
+        print(input_labels)
         labels_gradient = tf.gradients(loss, input_labels)
+        print(labels_gradient)
 
         gradient = tf.concat([latents_gradient, labels_gradient], 2)
         
