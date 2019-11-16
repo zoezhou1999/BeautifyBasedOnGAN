@@ -91,7 +91,7 @@ for j in range(args.outputs):
             vector = [gauss(0, 1) for j in range(512)]
             mag = sum(x ** 2 for x in vector) ** .5
             id_vectors=[x/mag for x in vector]
-            id_vectors = np.array(id_vectors, dtype=np.float32)
+            id_vectors = np.expand_dims(np.array(id_vectors, dtype=np.float32), axis=0)
             combined_labels = np.hstack((labels, id_vectors)).astype(np.float32)
 
             # infer conditioned noise to receive image
