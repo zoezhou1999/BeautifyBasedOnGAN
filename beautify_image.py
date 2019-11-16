@@ -51,7 +51,7 @@ G, D, Gs = misc.load_network_pkl(args.results_dir, None)
 # latents = misc.random_latents(1, Gs, random_state=np.random.RandomState(800))
 # labels = np.random.rand(1, args.labels_size)
 
-model1=beautyrater.BeautyRater('./beauty_prediction/experiments/train_beauty_vgg/VGG16_beauty_rates-new.pt')
+model1=beautyrater.BeautyRater('./beauty_prediction/trained_model/VGG16_beauty_rates-new.pt')
 features1=model1.predict(args.image_path)
 
 model2=facenet.FaceNet('./identity_prediction/models/20180402-114759/20180402-114759.pb')
