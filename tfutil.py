@@ -1386,17 +1386,17 @@ class Network:
                         rand_el2 = np.random.uniform(-1, 1, size=(1, edge2.shape[0]))
                         latents[j, edge2] = rand_el2
 
-                    edge1 = np.where(labels[j,0:labels.shape[1]-512] > 1.)[0]
-                    edge2 = np.where(labels[j,0:labels.shape[1]-512] < 0.)[0]
-                    if edge1.shape[0] > 0:
-                        rand_el1 = np.random.uniform(-1, 1, size=(1, edge1.shape[0]))
-                        labels[j, edge1] = rand_el1
-                    if edge2.shape[0] > 0:
-                        rand_el2 = np.random.uniform(-1, 1, size=(1, edge2.shape[0]))
-                        labels[j, edge2] = rand_el2
+                    # edge1 = np.where(labels[j,0:labels.shape[1]-512] > 1.)[0]
+                    # edge2 = np.where(labels[j,0:labels.shape[1]-512] < 0.)[0]
+                    # if edge1.shape[0] > 0:
+                    #     rand_el1 = np.random.uniform(-1, 1, size=(1, edge1.shape[0]))
+                    #     labels[j, edge1] = rand_el1
+                    # if edge2.shape[0] > 0:
+                    #     rand_el2 = np.random.uniform(-1, 1, size=(1, edge2.shape[0]))
+                    #     labels[j, edge2] = rand_el2
             else:
                 latents = np.clip(latents, -1, 1)
-                labels[:,0:labels.shape[1]-512] = np.clip(labels[:,0:labels.shape[1]-512], 0, 1)
+                # labels[:,0:labels.shape[1]-512] = np.clip(labels[:,0:labels.shape[1]-512], 0, 1)
                 # labels[:,labels.shape[1]-512:] = np.clip(labels[:,labels.shape[1]-512:], -1, 1)
 
             # Udating the dictionary for next itteration.
@@ -1432,7 +1432,7 @@ class Network:
                 for k in range(10):
                     y_pred = y_min[:]
                     y_pred[:,0:y_pred.shape[1]-512] = y_pred[:,0:y_pred.shape[1]-512] + (k*0.05)
-                    # y_pred[:,0:y_pred.shape[1]-512]=np.clip(y_pred[:,0:y_pred.shape[1]-512], 0, 1)
+                    y_pred[:,0:y_pred.shape[1]-512]= np.clip(y_pred[:,0:y_pred.shape[1]-512], 0, 1)
 
                     # infer conditioned noise to receive image
                     image = Gs.run(x_min, y_pred, minibatch_size=1, num_gpus=1, out_mul=127.5, out_add=127.5, out_shrink=1, out_dtype=np.uint8)
