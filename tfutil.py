@@ -1335,7 +1335,7 @@ class Network:
         templ.append(psy)
         # Create a new feed dictionary:
         feed_dict = dict(zip(templ, in_arrays))
-        feed_dict[input_labels] = tf.stop_gradient(in_arrays[1])
+        # feed_dict[input_labels] = tf.stop_gradient(in_arrays[1])
         # Return loss and the gradient with it's feed dictionary
         l_rate = learning_rate
         latents = in_arrays[0]
@@ -1401,7 +1401,7 @@ class Network:
 
             # Udating the dictionary for next itteration.
             feed_dict[input_latents] = latents
-            feed_dict[input_labels] = tf.stop_gradient(labels)
+            feed_dict[input_labels] = labels
 
             if g[0] < c_min:
                 # Saving the best latents and labels
