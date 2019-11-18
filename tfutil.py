@@ -1325,9 +1325,9 @@ class Network:
         # print(latents_gradient)
         # input_labels=entry_stop_gradients(input_labels, tf.expand_dims(mask,0))
         # print(input_labels)
-        # labels_gradient = tf.gradients(loss, tf.stop_gradient(input_labels))
+        labels_gradient = tf.gradients(loss, input_labels)
         # print(labels_gradient)
-        # gradient = tf.concat([latents_gradient, labels_gradient], 2)
+        gradient = tf.concat([latents_gradient, labels_gradient], 2)
         
         # We modify existing template to feed etalons
         # into the loss and gradient tensors:
@@ -1356,18 +1356,18 @@ class Network:
         for i in range(iters):
 
             g = tf.get_default_session().run(
-                [loss, latents_gradient],
+                [loss, gradient],
                 feed_dict=feed_dict)
 
             g_latents = np.expand_dims(g[1][0][0][:512], 0)
-            # g_labels = np.expand_dims(g[1][0][0][512:], 0)
+            g_labels = np.expand_dims(g[1][0][0][512:], 0)
 
             # g_latents = np.expand_dims(g[1][0][0][:], 0)
             # g_labels = np.expand_dims(g[1][0][0][512:], 0)
 
             latents = latents - l_rate * g_latents
             # labels[:,labels.shape[1]-512] = labels[:,labels.shape[1]-512] - l_rate * g_labels[:,labels.shape[1]-512]
-            # labels = labels - l_rate * g_labels
+            labels = labels - l_rate * g_labels
             # print("g_labels.shape")
             # print(g_labels.shape)
             # labels[:,labels.shape[1]-512] = labels[:,labels.shape[1]-512] - l_rate * g_labels
@@ -1386,18 +1386,27 @@ class Network:
                         rand_el2 = np.random.uniform(-1, 1, size=(1, edge2.shape[0]))
                         latents[j, edge2] = rand_el2
 
-                    # edge1 = np.where(labels[j,0:labels.shape[1]-512] > 1.)[0]
-                    # edge2 = np.where(labels[j,0:labels.shape[1]-512] < 0.)[0]
-                    # if edge1.shape[0] > 0:
-                    #     rand_el1 = np.random.uniform(-1, 1, size=(1, edge1.shape[0]))
-                    #     labels[j, edge1] = rand_el1
-                    # if edge2.shape[0] > 0:
-                    #     rand_el2 = np.random.uniform(-1, 1, size=(1, edge2.shape[0]))
-                    #     labels[j, edge2] = rand_el2
+                    edge1 = np.where(labels[j,0:labels.shape[1]-512] > 1.)[0]
+                    edge2 = np.where(labels[j,0:labels.shape[1]-512] < 0.)[0]
+                    if edge1.shape[0] > 0:
+                        rand_el1 = np.random.uniform(-1, 1, size=(1, edge1.shape[0]))
+                        labels[j, edge1] = rand_el1
+                    if edge2.shape[0] > 0:
+                        rand_el2 = np.random.uniform(-1, 1, size=(1, edge2.shape[0]))
+                        labels[j, edge2] = rand_el2
+
+                    edge1 = np.where(labels[j,labels.shape[1]-512:] >= 1.)[0]
+                    edge2 = np.where(labels[j,labels.shape[1]-512:] <= -1)[0]
+                    if edge1.shape[0] > 0:
+                        rand_el1 = np.random.uniform(-1, 1, size=(1, edge1.shape[0]))
+                        labels[j, edge1] = rand_el1
+                    if edge2.shape[0] > 0:
+                        rand_el2 = np.random.uniform(-1, 1, size=(1, edge2.shape[0]))
+                        labels[j, edge2] = rand_el2
             else:
                 latents = np.clip(latents, -1, 1)
-                # labels[:,0:labels.shape[1]-512] = np.clip(labels[:,0:labels.shape[1]-512], 0, 1)
-                # labels[:,labels.shape[1]-512:] = np.clip(labels[:,labels.shape[1]-512:], -1, 1)
+                labels[:,0:labels.shape[1]-512] = np.clip(labels[:,0:labels.shape[1]-512], 0, 1)
+                labels[:,labels.shape[1]-512:] = np.clip(labels[:,labels.shape[1]-512:], -1, 1)
 
             # Udating the dictionary for next itteration.
             feed_dict[input_latents] = latents
