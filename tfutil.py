@@ -1386,8 +1386,8 @@ class Network:
                         rand_el2 = np.random.uniform(-1, 1, size=(1, edge2.shape[0]))
                         latents[j, edge2] = rand_el2
 
-                    edge1 = np.where(labels[j] > 1.)[0]
-                    edge2 = np.where(labels[j] < 0.)[0]
+                    edge1 = np.where(labels[j,0:labels.shape[1]-512] > 1.)[0]
+                    edge2 = np.where(labels[j,0:labels.shape[1]-512] < 0.)[0]
                     if edge1.shape[0] > 0:
                         rand_el1 = np.random.uniform(-1, 1, size=(1, edge1.shape[0]))
                         labels[j, edge1] = rand_el1
@@ -1397,7 +1397,7 @@ class Network:
             else:
                 latents = np.clip(latents, -1, 1)
                 labels[:,0:labels.shape[1]-512] = np.clip(labels[:,0:labels.shape[1]-512], 0, 1)
-                labels[:,labels.shape[1]-512:] = np.clip(labels[:,labels.shape[1]-512:], -1, 1)
+                # labels[:,labels.shape[1]-512:] = np.clip(labels[:,labels.shape[1]-512:], -1, 1)
 
             # Udating the dictionary for next itteration.
             feed_dict[input_latents] = latents
