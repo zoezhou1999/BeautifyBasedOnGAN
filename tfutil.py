@@ -1298,14 +1298,18 @@ class Network:
         out_expr = self._run_cache[key]
         psy_name = str(self.scope + '/etalon')
         psy = tf.placeholder(tf.float32, out_expr[0].shape, name=psy_name)
-        
-        # Loss function: alpha*MSELoss + (1-alpha)*VGGLoss
-        loss = alpha * (tf.losses.mean_squared_error(labels=psy, predictions=out_expr[0])) + (1-alpha) * (tf.losses.mean_squared_error(labels=self.find_vgg_features_tf(psy), predictions=self.find_vgg_features_tf(out_expr[0])))
 
+        tf_constant_labels=tf.constant(in_arrays[1])
+        
+      
         latents_name = self.input_templates[0].name
         input_latents = tf.get_default_graph().get_tensor_by_name(latents_name)
         labels_name = self.input_templates[1].name
         input_labels = tf.get_default_graph().get_tensor_by_name(labels_name)
+
+          # Loss function: alpha*MSELoss + (1-alpha)*VGGLoss
+        loss = tf.losses.mean_squared_error(labels=tf_constant_labels, predictions=input_labels) + alpha * (tf.losses.mean_squared_error(labels=psy, predictions=out_expr[0])) + (1-alpha) * (tf.losses.mean_squared_error(labels=self.find_vgg_features_tf(psy), predictions=self.find_vgg_features_tf(out_expr[0])))
+
         
         # print("input_labels shape")
         # print(input_labels.get_shape().as_list())
