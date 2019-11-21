@@ -1441,10 +1441,10 @@ class Network:
 
                 iteration_name = 'best_restored_latent_vector_' + str(i) + '.npy'
                 np.save(os.path.join(dest_dir, iteration_name), x_min)
-
+                min_beauty_level=1/10.0
                 for k in range(10):
                     y_pred = y_min[:]
-                    y_pred[:,0:y_pred.shape[1]-512] = y_pred[:,0:y_pred.shape[1]-512] + (k*0.02)
+                    y_pred[:,0:y_pred.shape[1]-512] = y_pred[:,0:y_pred.shape[1]-512] * (min_beauty_level * (k+1))
                     # y_pred[:,0:y_pred.shape[1]-512]= np.clip(y_pred[:,0:y_pred.shape[1]-512], 0, 1)
 
                     # infer conditioned noise to receive image
