@@ -49,14 +49,14 @@ G, D, Gs = misc.load_network_pkl(args.results_dir, None)
 
 # initiate random input
 latents = misc.random_latents(1, Gs, random_state=np.random.RandomState(800))
-labels = np.random.rand(1, args.labels_size+512)
+# labels = np.random.rand(1, args.labels_size+512)
 
-# model1=beautyrater.BeautyRater('./beauty_prediction/trained_model/VGG16_beauty_rates-new.pt')
-# features1=model1.predict(args.image_path)
+model1=beautyrater.BeautyRater('./beauty_prediction/trained_model/VGG16_beauty_rates-new.pt')
+features1=model1.predict(args.image_path)
 
-# model2=facenet.FaceNet('./identity_prediction/models/20180402-114759/20180402-114759.pb')
-# features2=model2.singlePredict(args.image_path)
-# labels=np.hstack([features1,features2]).astype(np.float32)
+model2=facenet.FaceNet('./identity_prediction/models/20180402-114759/20180402-114759.pb')
+features2=model2.singlePredict(args.image_path)
+labels=np.hstack([features1,features2]).astype(np.float32)
 
 # upload image and convert to input tensor
 img = PIL.Image.open(args.image_path)
