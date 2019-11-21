@@ -1329,9 +1329,9 @@ class Network:
         # print(latents_gradient)
         # input_labels=entry_stop_gradients(input_labels, tf.expand_dims(mask,0))
         # print(input_labels)
-        labels_gradient = tf.gradients(loss, input_labels)
+        # labels_gradient = tf.gradients(loss, input_labels)
         # print(labels_gradient)
-        gradient = tf.concat([latents_gradient, labels_gradient], 2)
+        # gradient = tf.concat([latents_gradient, labels_gradient], 2)
         
         # We modify existing template to feed etalons
         # into the loss and gradient tensors:
@@ -1360,18 +1360,18 @@ class Network:
         for i in range(iters):
 
             g = tf.get_default_session().run(
-                [loss, gradient],
+                [loss, latents_gradient],
                 feed_dict=feed_dict)
 
             g_latents = np.expand_dims(g[1][0][0][:512], 0)
-            g_labels = np.expand_dims(g[1][0][0][512:], 0)
+            # g_labels = np.expand_dims(g[1][0][0][512:], 0)
 
             # g_latents = np.expand_dims(g[1][0][0][:], 0)
             # g_labels = np.expand_dims(g[1][0][0][512:], 0)
 
             latents = latents - l_rate * g_latents
             # labels[:,labels.shape[1]-512] = labels[:,labels.shape[1]-512] - l_rate * g_labels[:,labels.shape[1]-512]
-            labels = labels - l_rate * g_labels
+            # labels = labels - l_rate * g_labels
             # print("g_labels.shape")
             # print(g_labels.shape)
             # labels[:,labels.shape[1]-512] = labels[:,labels.shape[1]-512] - l_rate * g_labels
