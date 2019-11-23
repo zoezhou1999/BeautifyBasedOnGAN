@@ -10,7 +10,7 @@ import tensorflow as tf
 import tensorflow_hub as hub
 import PIL
 from PIL import Image
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 from identity_prediction import facenet
 from beauty_prediction import beautyrater
 

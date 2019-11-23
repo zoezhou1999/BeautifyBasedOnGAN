@@ -1243,7 +1243,7 @@ class Network:
         learning_rate,              # Initial learning rate
         alpha,                      # Weight of normal loss in relation to vgg loss
         iterations_to_save=2000,
-        stohastic_clipping = True,
+        stohastic_clipping = False,
         return_as_list  = False,    # True = return a list of NumPy arrays, False = return a single NumPy array, or a tuple if there are multiple outputs.
         print_progress  = False,    # Print progress to the console? Useful for very large input arrays.
         minibatch_size  = 8,     # Maximum minibatch size to use, None = disable batching.
