@@ -1325,7 +1325,7 @@ class Network:
         #     return tf.stop_gradient(mask_h * target) + mask * target
         
         # Gradients computation
-        latents_gradient = tf.gradients(loss, input_latents)
+        latents_gradient = tf.gradients(loss, input_latents,stop_gradients=[input_labels])
         # print(latents_gradient)
         # input_labels=entry_stop_gradients(input_labels, tf.expand_dims(mask,0))
         # print(input_labels)
