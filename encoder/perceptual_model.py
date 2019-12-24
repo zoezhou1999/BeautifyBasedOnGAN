@@ -8,6 +8,7 @@ from keras.utils import get_file
 from keras.applications.vgg16 import VGG16, preprocess_input
 import keras.backend as K
 import traceback
+from keras.models import load_model
 
 def load_images(images_list, image_size=256):
     loaded_images = list()
@@ -47,6 +48,8 @@ class PerceptualModel:
         self.use_grabcut = args.use_grabcut
         self.scale_mask = args.scale_mask
         self.mask_dir = args.mask_dir
+        self.load_vgg_model=args.load_vgg_model
+        self.landmarks_model_path=args.landmarks_model_path
         if (self.layer <= 0 or self.vgg_loss <= self.epsilon):
             self.vgg_loss = None
         self.pixel_loss = args.use_pixel_loss
@@ -58,9 +61,9 @@ class PerceptualModel:
         self.lpips_loss = args.use_lpips_loss
         if (self.lpips_loss <= self.epsilon):
             self.lpips_loss = None
-        self.l1_penalty = args.use_l1_penalty
-        if (self.l1_penalty <= self.epsilon):
-            self.l1_penalty = None
+        # self.l1_penalty = args.use_l1_penalty
+        # if (self.l1_penalty <= self.epsilon):
+        #     self.l1_penalty = None
         self.batch_size = batch_size
         if perc_model is not None and self.lpips_loss is not None:
             self.perc_model = perc_model
@@ -76,10 +79,10 @@ class PerceptualModel:
         if self.face_mask:
             import dlib
             self.detector = dlib.get_frontal_face_detector()
-            LANDMARKS_MODEL_URL = 'http://dlib.net/files/shape_predictor_68_face_landmarks.dat.bz2'
-            landmarks_model_path = unpack_bz2(get_file('shape_predictor_68_face_landmarks.dat.bz2',
-                                                    LANDMARKS_MODEL_URL, cache_subdir='temp'))
-            self.predictor = dlib.shape_predictor(landmarks_model_path)
+            # LANDMARKS_MODEL_URL = 'http://dlib.net/files/shape_predictor_68_face_landmarks.dat.bz2'
+            # landmarks_model_path = unpack_bz2(get_file('shape_predictor_68_face_landmarks.dat.bz2',
+            #                                         LANDMARKS_MODEL_URL, cache_subdir='temp'))
+            self.predictor = dlib.shape_predictor(self.landmarks_model_path)
 
     def compare_images(self,img1,img2):
         if self.perc_model is not None:
@@ -106,21 +109,31 @@ class PerceptualModel:
         generated_image_tensor = generator.generated_image
         generated_image = tf.image.resize_nearest_neighbor(generated_image_tensor,
                                                                   (self.img_size, self.img_size), align_corners=True)
+        
+        # print("print(generator.generator_output_shape)",generator.generator_output_shape)
 
-        self.ref_img = tf.get_variable('ref_img', shape=generated_image.shape,
+        self.ref_img = tf.get_variable('ref_img', shape=(self.batch_size,generated_image.shape[1],
+        generated_image.shape[2],generated_image.shape[3]),
                                                 dtype='float32', initializer=tf.initializers.zeros())
-        self.ref_weight = tf.get_variable('ref_weight', shape=generated_image.shape,
+        self.ref_weight = tf.get_variable('ref_weight', shape=(self.batch_size,generated_image.shape[1],
+        generated_image.shape[2],generated_image.shape[3]),
                                                dtype='float32', initializer=tf.initializers.zeros())
         self.add_placeholder("ref_img")
         self.add_placeholder("ref_weight")
 
         if (self.vgg_loss is not None):
+            # Local_VGG16=load_model(self.load_vgg_model)
             vgg16 = VGG16(include_top=False, input_shape=(self.img_size, self.img_size, 3))
+            # vgg16 = Local_VGG16(include_top=False, input_shape=(self.img_size, self.img_size, 3))
             self.perceptual_model = Model(vgg16.input, vgg16.layers[self.layer].output)
             generated_img_features = self.perceptual_model(preprocess_input(self.ref_weight * generated_image))
-            self.ref_img_features = tf.get_variable('ref_img_features', shape=generated_img_features.shape,
+            print("generated_img_features.shape",generated_img_features.shape)
+            
+            self.ref_img_features = tf.get_variable('ref_img_features', shape=(self.batch_size,generated_img_features.shape[1],
+        generated_img_features.shape[2],generated_img_features.shape[3]),
                                                 dtype='float32', initializer=tf.initializers.zeros())
-            self.features_weight = tf.get_variable('features_weight', shape=generated_img_features.shape,
+            self.features_weight = tf.get_variable('features_weight', shape=(self.batch_size,generated_img_features.shape[1],
+        generated_img_features.shape[2],generated_img_features.shape[3]),
                                                dtype='float32', initializer=tf.initializers.zeros())
             self.sess.run([self.features_weight.initializer, self.features_weight.initializer])
             self.add_placeholder("ref_img_features")
@@ -237,7 +250,7 @@ class PerceptualModel:
     def optimize(self, vars_to_optimize, iterations=200):
         vars_to_optimize = vars_to_optimize if isinstance(vars_to_optimize, list) else [vars_to_optimize]
         optimizer = tf.train.AdamOptimizer(learning_rate=self.learning_rate)
-        min_op = optimizer.minimize(self.loss, var_list=[vars_to_optimize])
+        min_op = optimizer.minimize(self.loss, var_list=vars_to_optimize)
         self.sess.run(tf.variables_initializer(optimizer.variables()))
         self.sess.run(self._reset_global_step)
         fetch_ops = [min_op, self.loss, self.learning_rate]

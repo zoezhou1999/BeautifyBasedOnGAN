@@ -148,6 +148,10 @@ python beautify_image.py --results_dir experiment_folder --image_path samples/je
 nohup python beautify_image.py --results_dir ./results/008-pgan-ffhq-cond-preset-v2-1gpu-fp32 --image_path ./datasets/ffhq128x128/img/00001.png > btfyimg.out 2>&1 &
 ```
 
+```
+nohup python beautify_image.py --results_dir ../BeautifyBasedOnGAN/results/008-pgan-ffhq-cond-preset-v2-1gpu-fp32 --image_path ../BeautifyBasedOnGAN/datasets/ffhq128x128/img/00001.png > btfyimg.out 2>&1 &
+```
+
 ### Test ./datasets/ffhq128x128/img/00001.png(00003.png 00010.png 00048.png 00016.png 00081.png)
 
 ##### img/00001.png
