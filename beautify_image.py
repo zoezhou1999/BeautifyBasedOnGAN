@@ -41,8 +41,6 @@ def unpack_bz2(src_path):
 parser = argparse.ArgumentParser()
 parser.add_argument('--results_dir', '-results_dir', help='name of training experiment folder', default='dean_cond_batch16', type=str)
 parser.add_argument('--labels_size', '-labels_size', help='size of labels vector', default=572, type=int)
-# parser.add_argument('--iters', '-iters', help='learning rate of algorithm', default=100000, type=int)
-# parser.add_argument('--lr', '-lr', help='learning rate of algorithm', default=0.1, type=float)
 parser.add_argument('--alpha', '-alpha', help='weight of normal loss in relation to vgg loss', default=0.7, type=float)
 parser.add_argument('--gpu', '-gpu', help='gpu index for the algorithm to run on', default='0', type=str)
 parser.add_argument('--image_path', '-image_path', help='full path to image', default='../datasets/CelebA-HQ/img/03134.png', type=str)
@@ -121,18 +119,6 @@ tf_config = EasyDict()  # TensorFlow session config, set by tfutil.init_tf().
 tf_config['graph_options.place_pruned_graph'] = True  # False (default) = Check that all ops are available on the designated device.
 tf_config['gpu_options.allow_growth'] = True
 tfutil.init_tf(tf_config)
-
-
-# upload image and convert to input tensor
-# img = PIL.Image.open(args.image_path)
-# img = img.resize((args.resolution,args.resolution), Image.ANTIALIAS)
-# img.save((args.image_path).split('/')[-1]) # save image for debug purposes
-# img = np.asarray(img)
-# img = img.transpose(2, 0, 1)
-# img = np.expand_dims(img, axis=0)
-# img = (img / 127.5) - 1.0 # normalization
-
-# LANDMARKS_MODEL_URL = 'http://dlib.net/files/shape_predictor_68_face_landmarks.dat.bz2'
 
 landmarks_detector = LandmarksDetector(args.landmarks_model_path)
 aligned_face_path=None
@@ -272,8 +258,6 @@ generator.get_beautify_image(dlatents=best_dlatent,dlabels=best_dlabel, index=ar
 history.append((best_loss, best_dlatent, best_dlabel))
 print(" ".join([name]), " Loss {:.4f}".format(best_loss))
 
-
-
 # Generate images from found dlatents and save them
 
 generator.set_dlatents(best_dlatent)
@@ -295,6 +279,3 @@ with open(result_subdir+'/history_of_latents.txt', 'w') as f:
 
 generator.reset_dlatents()
 generator.reset_dlabels()
-
-# # execute algorithm
-# history = Gs.reverse_gan_for_etalons(generated_dlatents[0], labels, img, results_dir=args.results_dir, dest_dir=result_subdir, iters=args.iters, learning_rate=args.lr, alpha=args.alpha)
