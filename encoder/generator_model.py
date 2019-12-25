@@ -63,9 +63,12 @@ class Generator:
         clipped_values1 = tf.where(clipping_mask1, tf.random_normal(shape=(self.batch_size, 512)), self.dlatent_variable)
         self.stochastic_clip_op1 = tf.assign(self.dlatent_variable, clipped_values1)
 
-        clipping_mask2 = tf.math.logical_or(self.dlabel_variable > self.clipping_threshold, self.dlabel_variable < 0)
+        clipping_mask2_1 = tf.math.logical_or(self.dlabel_variable[:,0:60] > self.clipping_threshold, self.dlabel_variable[:,0:60] < 0)
+        clipping_mask2_2 = tf.math.logical_or(self.dlabel_variable[:,60:] > self.clipping_threshold, self.dlabel_variable[:,60:] < -self.clipping_threshold)
+        clipping_mask2 = tf.concat([clipping_mask2_1,clipping_mask2_2],axis=1)
         clipped_values2 = tf.where(clipping_mask2, tf.random_normal(shape=(self.batch_size, labels_size)), self.dlabel_variable)
         self.stochastic_clip_op2 = tf.assign(self.dlabel_variable, clipped_values2)
+
 
     def reset_dlatents(self):
         self.set_dlatents(self.initial_dlatents)
