@@ -169,6 +169,7 @@ class Generator:
         for k in range(10):
             y_pred = dlabels[:]
             y_pred = y_pred + (k*0.05)
+            y_pred = np.clip(y_pred, 0.0, 1.0)
             img=self.sess.run(self.output_name_image_uint8, feed_dict={self.labels_name_tensor: y_pred, self.latents_name_tensor: dlatents})
             img = PIL.Image.fromarray(img[0], 'RGB')
             img.save(os.path.join(dir, '{}-{}.png'.format('%04d' % index,k)), 'PNG')
