@@ -109,7 +109,7 @@ class PerceptualModel:
         self._reset_global_step = tf.assign(global_step, 0)
         # self.learning_rate = tf.train.exponential_decay(self.lr, incremented_global_step,
         #         self.decay_steps, self.decay_rate, staircase=True)
-        self.learning_rate = self.lr
+        self.learning_rate = tf.constant(self.lr)
         self.sess.run([self._reset_global_step])
 
         generated_image_tensor = generator.generated_image
