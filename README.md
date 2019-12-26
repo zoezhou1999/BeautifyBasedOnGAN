@@ -165,6 +165,9 @@ python beautify_image.py --results_dir experiment_folder --image_path samples/je
 nohup python beautify_image.py --results_dir ./results/008-pgan-ffhq-cond-preset-v2-1gpu-fp32 --image_path ./datasets/ffhq128x128/img/00001.png > btfyimg.out 2>&1 &
 ```
 
+python beautify_image.py --results_dir ./results/004-pgan-ffhq_id-cond-preset-v2-1gpu-fp32 --image_path ./datasets/ffhq128x128/img/00001.png
+
+
 ### Test ./datasets/ffhq128x128/img/00001.png(00003.png 00010.png 00048.png 00016.png 00081.png)
 
 This is result-pdf github link. 
