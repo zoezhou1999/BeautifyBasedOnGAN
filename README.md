@@ -166,12 +166,18 @@ nohup python beautify_image.py --results_dir ./results/008-pgan-ffhq-cond-preset
 ```
 
 
+
+
+
 ```
-python beautify_image.py --results_dir ./results/004-pgan-ffhq_id-cond-preset-v2-1gpu-fp32 --image_path ./datasets/ffhq128x128/img/00001.png --load_vgg_beauty_rater_model ./beauty_prediction/trained_model/VGG16_beauty_rates-new.pt --iterations 5000
+python beautify_image.py --results_dir ./results-old/004-pgan-ffhq_id-cond-preset-v2-1gpu-fp32 --image_path ./datasets/ffhq128x128/img/00001.png --load_vgg_beauty_rater_model ./beauty_prediction/trained_model/VGG16_beauty_rates-new.pt --iterations 5000
 ```
 ```
-python beautify_image.py --results_dir ./results/004-pgan-ffhq_id-cond-preset-v2-1gpu-fp32 --image_path ./datasets/ffhq128x128/img/00003.png --load_vgg_beauty_rater_model ./beauty_prediction/trained_model/VGG16_beauty_rates-new.pt --iterations 5000
+python beautify_image.py --results_dir ./results-old/004-pgan-ffhq_id-cond-preset-v2-1gpu-fp32 --image_path ./datasets/ffhq128x128/img/00003.png --load_vgg_beauty_rater_model ./beauty_prediction/trained_model/VGG16_beauty_rates-new.pt --iterations 5000
 ```
+
+
+
 ```
 python beautify_image.py --results_dir ./results/004-pgan-ffhq_id-cond-preset-v2-1gpu-fp32 --image_path ./datasets/ffhq128x128/img/00010.png --load_vgg_beauty_rater_model ./beauty_prediction/trained_model/VGG16_beauty_rates-new.pt --iterations 5000
 ```
@@ -249,11 +255,6 @@ python beautify_image.py --results_dir ./results/004-pgan-ffhq_id-cond-preset-v2
 ```
 python beautify_image.py --results_dir ./results/004-pgan-ffhq_id-cond-preset-v2-1gpu-fp32 --image_path ./datasets/ffhq128x128/img/00048.png --load_vgg_beauty_rater_model ./beauty_prediction/trained_model/VGG16_beauty_rates-new.pt --use_beauty_score_loss 0 --iterations 5000
 ```
-
-
-
-
-
 
 
 ```
