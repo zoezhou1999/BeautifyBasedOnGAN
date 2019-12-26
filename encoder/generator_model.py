@@ -96,7 +96,7 @@ class Generator:
     def get_beautify_image(self, dlatents=None,dlabels=None, index=None,dir=None):
         for k in range(10):
             y_pred = dlabels[:]
-            y_pred = y_pred + (k*0.05)
+            y_pred[:,0:60] = y_pred[:,0:60] + (k*0.05)
             img=self.sess.run(self.output_name_image_uint8, feed_dict={self.labels_name_tensor: y_pred, self.latents_name_tensor: dlatents})
             img = PIL.Image.fromarray(img[0], 'RGB')
             img.save(os.path.join(dir, '{}-{}.png'.format('%04d' % index,k)), 'PNG')
