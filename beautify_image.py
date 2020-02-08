@@ -83,7 +83,7 @@ parser.add_argument('--use_mssim_loss', default=100, help='Use MS-SIM perceptual
 parser.add_argument('--use_lpips_loss', default=100, help='Use LPIPS perceptual loss; 0 to disable, > 0 to scale.', type=float)
 # parser.add_argument('--use_l1_penalty', default=1, help='Use L1 penalty on latents; 0 to disable, > 0 to scale.', type=float)
 parser.add_argument('--use_beauty_score_loss', default=100, help='Use LPIPS perceptual loss; 0 to disable, > 0 to scale.', type=float)
-#
+
 # Generator params
 parser.add_argument('--randomize_noise', default=False, help='Add noise to dlatents during optimization', type=bool)
 parser.add_argument('--tile_dlatents', default=False, help='Tile dlatents to use a single vector at each scale', type=bool)
