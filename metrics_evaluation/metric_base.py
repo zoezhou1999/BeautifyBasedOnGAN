@@ -16,8 +16,8 @@ import dnnlib
 import dnnlib.tflib as tflib
 
 import config
-from training import misc
-from training import dataset
+import misc
+import dataset
 
 #----------------------------------------------------------------------------
 # Standard metrics.

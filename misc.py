@@ -430,14 +430,24 @@ from random import gauss
 # Convenience wrappers for pickle that are able to load data produced by
 # older versions of the code.
 
-def load_pkl(filename):
-    import legacy
-    with open(filename, 'rb') as file:
-        return legacy.LegacyUnpickler(file, encoding='latin1').load()
+# def load_pkl(filename):
+#     import legacy
+#     with open(filename, 'rb') as file:
+#         return legacy.LegacyUnpickler(file, encoding='latin1').load()
+
+# def save_pkl(obj, filename):
+#     with open(filename, 'wb') as file:
+#         pickle.dump(obj, file, protocol=pickle.HIGHEST_PROTOCOL)
+
+
+def load_pkl(file_or_url):
+    with open_file_or_url(file_or_url) as file:
+        return pickle.load(file, encoding='latin1')
 
 def save_pkl(obj, filename):
     with open(filename, 'wb') as file:
         pickle.dump(obj, file, protocol=pickle.HIGHEST_PROTOCOL)
+
 
 #----------------------------------------------------------------------------
 # Image utils.
@@ -764,5 +774,59 @@ def setup_text_label(text, font='Calibri', fontsize=32, padding=6, glow_size=2.0
     value = (alpha, glow)
     _text_label_cache[key] = value
     return value
+    
+#----------------------------------------------------------------------------
+# Locating results.
+
+def locate_run_dir(run_id_or_run_dir):
+    if isinstance(run_id_or_run_dir, str):
+        if os.path.isdir(run_id_or_run_dir):
+            return run_id_or_run_dir
+        converted = dnnlib.submission.submit.convert_path(run_id_or_run_dir)
+        if os.path.isdir(converted):
+            return converted
+
+    run_dir_pattern = re.compile('^0*%s-' % str(run_id_or_run_dir))
+    for search_dir in ['']:
+        full_search_dir = config.result_dir if search_dir == '' else os.path.normpath(os.path.join(config.result_dir, search_dir))
+        run_dir = os.path.join(full_search_dir, str(run_id_or_run_dir))
+        if os.path.isdir(run_dir):
+            return run_dir
+        run_dirs = sorted(glob.glob(os.path.join(full_search_dir, '*')))
+        run_dirs = [run_dir for run_dir in run_dirs if run_dir_pattern.match(os.path.basename(run_dir))]
+        run_dirs = [run_dir for run_dir in run_dirs if os.path.isdir(run_dir)]
+        if len(run_dirs) == 1:
+            return run_dirs[0]
+    raise IOError('Cannot locate result subdir for run', run_id_or_run_dir)
 
 #----------------------------------------------------------------------------
+# Loading data from previous training runs.
+
+# def load_network_pkl(run_id_or_run_dir_or_network_pkl, snapshot_or_network_pkl=None):
+#     return load_pkl(locate_network_pkl(run_id_or_run_dir_or_network_pkl, snapshot_or_network_pkl))
+
+def parse_config_for_previous_run(run_id):
+    from collections import defaultdict
+    run_dir = locate_run_dir(run_id)
+
+    # Parse config.txt.
+    cfg = defaultdict(dict)
+    with open(os.path.join(run_dir, 'config.txt'), 'rt') as f:
+        for line in f:
+            line = re.sub(r"^{?\s*'(\w+)':\s*{(.*)(},|}})$", r"\1 = {\2}", line.strip())
+            if line.startswith('dataset =') or line.startswith('train ='):
+                exec(line, cfg, cfg) # pylint: disable=exec-used
+
+    # Handle legacy options.
+    if 'file_pattern' in cfg['dataset']:
+        cfg['dataset']['tfrecord_dir'] = cfg['dataset'].pop('file_pattern').replace('-r??.tfrecords', '')
+    if 'mirror_augment' in cfg['dataset']:
+        cfg['train']['mirror_augment'] = cfg['dataset'].pop('mirror_augment')
+    if 'max_labels' in cfg['dataset']:
+        v = cfg['dataset'].pop('max_labels')
+        if v is None: v = 0
+        if v == 'all': v = 'full'
+        cfg['dataset']['max_label_size'] = v
+    if 'max_images' in cfg['dataset']:
+        cfg['dataset'].pop('max_images')
+    return cfg
