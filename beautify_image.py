@@ -54,9 +54,9 @@ for index, path in enumerate(image_paths):
     labels = np.random.rand(1, args.labels_size)
 
     # upload image and convert to input tensor
-    img = PIL.Image.open(args.image_path)
+    img = PIL.Image.open(path)
     img = img.resize((args.resolution,args.resolution), Image.ANTIALIAS)
-    img.save((args.image_path).split('/')[-1]) # save image for debug purposes
+    img.save((path).split('/')[-1]) # save image for debug purposes
     img = np.asarray(img)
     img = img.transpose(2, 0, 1)
     img = np.expand_dims(img, axis=0)
