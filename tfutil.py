@@ -1328,7 +1328,7 @@ class Network:
         history = []
         c_min = 1e+9
         x_min = None
-        x_min = None
+        y_min = None
         G, D, Gs = misc.load_network_pkl(results_dir, None)
 
         # Here is main optimisation logic. Stohastic clipping is
@@ -1411,6 +1411,19 @@ class Network:
                     image = Gs.run(x_min, y_pred, minibatch_size=1, num_gpus=1, out_mul=127.5, out_add=127.5, out_shrink=1, out_dtype=np.uint8)
                     # save generated image as 'i.png' and noise vector as noise_vector.txt
                     misc.save_image_grid(image, os.path.join(dest_dir, '{}_{}.png'.format('%04d' % i, k)), [0, 255], [1, 1])
+
+        #for final iteration results
+        iteration_name = 'best_restored_latent_vector_' + str(iters) + '.npy'
+        np.save(os.path.join(dest_dir, iteration_name), x_min)
+
+        for k in range(10):
+            y_pred = y_min
+            y_pred = y_pred + (k*0.05)
+
+            # infer conditioned noise to receive image
+            image = Gs.run(x_min, y_pred, minibatch_size=1, num_gpus=1, out_mul=127.5, out_add=127.5, out_shrink=1, out_dtype=np.uint8)
+            # save generated image as 'i.png' and noise vector as noise_vector.txt
+            misc.save_image_grid(image, os.path.join(dest_dir, '{}_{}.png'.format('%04d' % iters, k)), [0, 255], [1, 1])
 
         # We return back the optimisation history of latents
         history.append((c_min, x_min))
