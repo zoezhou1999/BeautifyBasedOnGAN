@@ -48,7 +48,9 @@ for index, path in enumerate(image_paths):
     # manual parameters
     prefix=os.path.basename(path)
     prefix=prefix[0:prefix.find(".")]
-    result_subdir=os.path.join(result_subdir,prefix)
+    result_subsubdir=os.path.join(result_subdir,prefix)
+    if os.path.exists(result_subsubdir) == False:
+        os.mkdir(result_subsubdir)
     # initiate random input
     latents = misc.random_latents(1, Gs, random_state=np.random.RandomState(800))
     labels = np.random.rand(1, args.labels_size)
@@ -63,7 +65,7 @@ for index, path in enumerate(image_paths):
     img = (img / 127.5) - 1.0 # normalization
 
     # execute algorithm
-    history = Gs.reverse_gan_for_etalons(latents, labels, img, results_dir=args.results_dir, dest_dir=result_subdir, iters=args.iters, learning_rate=args.lr, alpha=args.alpha)
+    history = Gs.reverse_gan_for_etalons(latents, labels, img, results_dir=args.results_dir, dest_dir=result_subsubdir, iters=args.iters, learning_rate=args.lr, alpha=args.alpha)
 
     # save history of latents
     with open(result_subdir+'/history_of_latents.txt', 'w') as f:
