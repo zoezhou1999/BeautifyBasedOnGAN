@@ -424,7 +424,8 @@ class EasyDict(dict):
 
 data_dir = 'datasets'
 result_dir = 'results'
-
+cache_dir = 'cache'
+run_dir_ignore = ['results', 'datasets', 'cache']
 #----------------------------------------------------------------------------
 # TensorFlow options.
 
