@@ -12,6 +12,7 @@ import PIL
 from PIL import Image
 import matplotlib.pyplot as plt
 import glob
+import gc
 
 # initialize parser arguments
 parser = argparse.ArgumentParser()
@@ -38,13 +39,14 @@ tf_config = EasyDict()  # TensorFlow session config, set by tfutil.init_tf().
 tf_config['graph_options.place_pruned_graph'] = True  # False (default) = Check that all ops are available on the designated device.
 tf_config['gpu_options.allow_growth'] = True
 tfutil.init_tf(tf_config)
-# load network
-network_pkl = misc.locate_network_pkl(args.results_dir)
-print('Loading network from "%s"...' % network_pkl)
-G, D, Gs = misc.load_network_pkl(args.results_dir, None)
 result_subdir = misc.create_result_subdir('results', 'inference_test')
 
 for index, path in enumerate(image_paths):
+    # load network
+    network_pkl = misc.locate_network_pkl(args.results_dir)
+    print('Loading network from "%s"...' % network_pkl)
+    G, D, Gs = misc.load_network_pkl(args.results_dir, None)
+    
     # manual parameters
     prefix=os.path.basename(path)
     prefix=prefix[0:prefix.find(".")]
@@ -68,9 +70,16 @@ for index, path in enumerate(image_paths):
     history = Gs.reverse_gan_for_etalons(latents, labels, img, results_dir=args.results_dir, dest_dir=result_subsubdir, iters=args.iters, learning_rate=args.lr, alpha=args.alpha)
 
     # save history of latents
-    with open(result_subdir+'/history_of_latents.txt', 'w') as f:
+    with open(result_subsubdir+'/history_of_latents.txt', 'w') as f:
         for item in history:
             f.write("{}\n".format(item))
             f.write("\n")
+    
+    del G, D, Gs, history
+    gc.collect()
+    
+
+    
+
 
 
