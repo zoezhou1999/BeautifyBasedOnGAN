@@ -802,9 +802,6 @@ def locate_run_dir(run_id_or_run_dir):
 #----------------------------------------------------------------------------
 # Loading data from previous training runs.
 
-# def load_network_pkl(run_id_or_run_dir_or_network_pkl, snapshot_or_network_pkl=None):
-#     return load_pkl(locate_network_pkl(run_id_or_run_dir_or_network_pkl, snapshot_or_network_pkl))
-
 def parse_config_for_previous_run(run_id):
     from collections import defaultdict
     run_dir = locate_run_dir(run_id)

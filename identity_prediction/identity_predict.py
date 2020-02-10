@@ -30,7 +30,7 @@ def preprocess_img(x):
 
 parser = argparse.ArgumentParser(description='face identity prediction')
 parser.add_argument('--model', default='./models/20180402-114759/20180402-114759.pb', help='path to load model.')
-parser.add_argument('--dataset', type=str, default='../datasets/ffhq128x128', help='path to the dataset we want to label')
+parser.add_argument('--dataset', type=str, default='../datasets/ffhq_128x128', help='path to the dataset we want to label')
 args = parser.parse_args()
 
 graph = load_pb(args.model)
