@@ -36,6 +36,9 @@ def unpack_bz2(src_path):
         fp.write(data)
     return dst_path
 
+def split_to_batches(l, n):
+    for i in range(0, len(l), n):
+        yield l[i:i + n]
 
 # initialize parser arguments
 parser = argparse.ArgumentParser()
@@ -52,7 +55,7 @@ parser.add_argument('--em_scale', default=0.1, help='Scaling factor for eye-mout
 parser.add_argument('--use_alpha', default=False, help='Add an alpha channel for masking', type=bool)
 parser.add_argument('--iterations_to_save', default=500, help='iterations_to_save', type=int)
 
-# parser.add_argument('src_dir', help='Directory with images for encoding')
+parser.add_argument('--src_dir', help='Directory with images for encoding')
 parser.add_argument('--generated_images_dir', help='Directory for storing generated images', default="generated_images")
 parser.add_argument('--dlatent_dir', help='Directory for storing dlatent representations', default="latent_representations")
 parser.add_argument('--dlabel_dir', help='Directory for storing dlatent representations', default="label_representations")
@@ -60,6 +63,7 @@ parser.add_argument('--data_dir', default='data', help='Directory for storing op
 parser.add_argument('--mask_dir', default='masks', help='Directory for storing optional masks')
 parser.add_argument('--load_last', default='', help='Start with embeddings from directory')
 parser.add_argument('--landmarks_model_path', help='Fetch a fl model', default='data/shape_predictor_68_face_landmarks.dat')
+parser.add_argument('--batch_size', default=1, help='Batch size for generator and perceptual model', type=int)
 
 # Perceptual model params
 parser.add_argument('--image_size', default=256, help='Size of images for perceptual model', type=int)
@@ -123,39 +127,40 @@ tfutil.init_tf(tf_config)
 landmarks_detector = LandmarksDetector(args.landmarks_model_path)
 aligned_face_path=None
 ALIGNED_IMAGES_DIR = args.aligned_dir
-try:
-    raw_img_path = args.image_path
-    print('Getting landmarks...')
-    for i, face_landmarks in enumerate(landmarks_detector.get_landmarks(raw_img_path), start=1):
+for img_name in os.listdir(args.src_dir):
+        print('Aligning %s ...' % img_name)
         try:
-            print('Starting face alignment...')
-            face_img_name = '%s_%02d.png' % (os.path.splitext(os.path.basename(args.image_path))[0], i)
-            aligned_face_path = os.path.join(ALIGNED_IMAGES_DIR, face_img_name)
-            image_align(raw_img_path, aligned_face_path, face_landmarks, output_size=args.resolution, x_scale=args.x_scale, y_scale=args.y_scale, em_scale=args.em_scale, alpha=args.use_alpha)
-            print('Wrote result %s' % aligned_face_path)
+            raw_img_path = os.path.join(args.src_dir, img_name)
+            fn = face_img_name = '%s_%02d.png' % (os.path.splitext(img_name)[0], 1)
+            if os.path.isfile(fn):
+                continue
+            print('Getting landmarks...')
+            for i, face_landmarks in enumerate(landmarks_detector.get_landmarks(raw_img_path), start=1):
+                try:
+                    print('Starting face alignment...')
+                    face_img_name = '%s_%02d.png' % (os.path.splitext(img_name)[0], i)
+                    aligned_face_path = os.path.join(ALIGNED_IMAGES_DIR, face_img_name)
+                    image_align(raw_img_path, aligned_face_path, face_landmarks, output_size=args.output_size, x_scale=args.x_scale, y_scale=args.y_scale, em_scale=args.em_scale, alpha=args.use_alpha)
+                    print('Wrote result %s' % aligned_face_path)
+                except:
+                    print("Exception in face alignment!")
         except:
-            print("Exception in face alignment!")
-except:
-    print("Exception in landmark detection!")
+            print("Exception in landmark detection!")
 
 #release memory
 del landmarks_detector
 gc.collect()
 
-ref_images=aligned_face_path
+ref_images = [os.path.join(args.src_dir, x) for x in os.listdir(args.src_dir)]
+ref_images = list(filter(os.path.isfile, ref_images))
 
-beautyrater_model=beautyrater.BeautyRater(args.load_vgg_beauty_rater_model)
-f1_labels=beautyrater_model.predict(ref_images)
-
-facenet_model=facenet.FaceNet(args.load_facenet_model)
-f2_labels=facenet_model.singlePredict(ref_images)
-
-constant_labels=np.hstack([f1_labels,f2_labels]).astype(np.float32)
+if len(ref_images) == 0:
+    raise Exception('%s is empty' % args.src_dir)
 
 #release memory
-del beautyrater_model
-del facenet_model
-gc.collect()
+# del beautyrater_model
+# del facenet_model
+# gc.collect()
 
 args.decay_steps *= 0.01 * args.iterations # Calculate steps as a percent of total iterations
 
@@ -182,100 +187,118 @@ perc_model = None
 if (args.use_lpips_loss > 0.00000001):
     with open(args.load_perc_model,"rb") as f:
         perc_model =  pickle.load(f)
-perceptual_model = PerceptualModel(args, perc_model=perc_model, batch_size=1,constant_labels=constant_labels)
-perceptual_model.build_perceptual_model(generator)
 
 ff_model = None
+beautyrater_model=beautyrater.BeautyRater(args.load_vgg_beauty_rater_model)
+facenet_model=facenet.FaceNet(args.load_facenet_model)
 
 # Optimize (only) dlatents by minimizing perceptual loss between reference and generated images in feature space
-name = os.path.splitext(os.path.basename(ref_images))[0]
+for batch_index, images_batch in enumerate(tqdm(split_to_batches(ref_images, args.batch_size), total=len(ref_images)//args.batch_size)):
+    names = [os.path.splitext(os.path.basename(x))[0] for x in images_batch]
+    # name = os.path.splitext(os.path.basename(ref_images))[0]
+    
+    dlatents = None
+    dlabels=None
+    constant_labels=None
+    for image_path in images_batch:
+        f1_labels=beautyrater_model.predict(image_path)
+        f2_labels=facenet_model.singlePredict(image_path)
+        cl=np.hstack([f1_labels,f2_labels]).astype(np.float32)
+        if (constant_labels is None):
+            constant_labels = cl
+        else:
+            constant_labels = np.vstack((constant_labels,cl))
 
-perceptual_model.set_reference_images([ref_images])
-dlatents = None
-dlabels=None
-if (args.load_last != ''): # load previous dlatents for initialization
-    dl = np.expand_dims(np.load(os.path.join(args.load_last, f'{name}.npy')),axis=0)
-    if (dlatents is None):
-        dlatents = dl
+    perceptual_model = PerceptualModel(args, perc_model=perc_model, batch_size=args.batch_size,constant_labels=constant_labels)
+    perceptual_model.build_perceptual_model(generator)
+    perceptual_model.set_reference_images(images_batch)
+
+    if (args.load_last != ''): # load previous dlatents for initialization
+        for name in names:
+            dl = np.expand_dims(np.load(os.path.join(args.load_last, f'{name}.npy')),axis=0)
+            if (dlatents is None):
+                dlatents = dl
+            else:
+                dlatents = np.vstack((dlatents,dl))
     else:
-        dlatents = np.vstack((dlatents,dl))
-else:
-    if (ff_model is None):
-        if os.path.exists(args.load_resnet):
-            print("Loading ResNet Model:")
-            ff_model = load_model(args.load_resnet)
-            from keras.applications.resnet50 import preprocess_input
-    if (ff_model is None):
-        if os.path.exists(args.load_effnet):
-            import efficientnet
-            print("Loading EfficientNet Model:")
-            ff_model = load_model(args.load_effnet)
-            from efficientnet import preprocess_input
-    if (ff_model is not None): # predict initial dlatents with ResNet model
-        dlatents = ff_model.predict(preprocess_input(load_images([ref_images],image_size=args.resnet_image_size)))
+        if (ff_model is None):
+            if os.path.exists(args.load_resnet):
+                print("Loading ResNet Model:")
+                ff_model = load_model(args.load_resnet)
+                from keras.applications.resnet50 import preprocess_input
+        if (ff_model is None):
+            if os.path.exists(args.load_effnet):
+                import efficientnet
+                print("Loading EfficientNet Model:")
+                ff_model = load_model(args.load_effnet)
+                from efficientnet import preprocess_input
+        if (ff_model is not None): # predict initial dlatents with ResNet model
+            dlatents = ff_model.predict(preprocess_input(load_images(images_batch,image_size=args.resnet_image_size)))
 
-#release memory
-del ff_model
-gc.collect()
+    dlatents=np.mean(dlatents,axis=1)
 
-dlatents=np.mean(dlatents,axis=1)
+    # dlatents = misc.random_latents(1, Gs, random_state=np.random.RandomState(800))
 
-# dlatents = misc.random_latents(1, Gs, random_state=np.random.RandomState(800))
+    if dlatents is not None:
+        generator.set_dlatents(dlatents)
 
-if dlatents is not None:
-    generator.set_dlatents(dlatents)
+    dlabels=np.random.rand(args.batch_size, args.labels_size)
 
+    if dlabels is not None:
+        generator.set_dlabels(dlabels)
 
-dlabels=np.random.rand(1, args.labels_size)
+    op = perceptual_model.optimize([generator.dlatent_variable, generator.dlabel_variable], iterations=args.iterations)
+    pbar = tqdm(op, leave=False, total=args.iterations)
+    vid_count = 0
+    best_loss = None
+    best_dlatent = None
+    best_dlabel=None
+    history=[]
 
-if dlabels is not None:
-    generator.set_dlabels(dlabels)
+    result_subsubdir=os.path.join(result_subdir,str(batch_index))
+    if os.path.exists(result_subsubdir) == False:
+        os.mkdir(result_subsubdir)
 
-op = perceptual_model.optimize([generator.dlatent_variable, generator.dlabel_variable], iterations=args.iterations)
-pbar = tqdm(op, leave=False, total=args.iterations)
-vid_count = 0
-best_loss = None
-best_dlatent = None
-best_dlabel=None
-history=[]
-
-for i, loss_dict in enumerate(pbar):
-    pbar.set_description(" ".join([name]) + ": " + "; ".join(["{} {:.4f}".format(k, v)
+    for i, loss_dict in enumerate(pbar):
+        pbar.set_description(" ".join([name]) + ": " + "; ".join(["{} {:.4f}".format(k, v)
                     for k, v in loss_dict.items()]))
-    if best_loss is None or loss_dict["loss"] < best_loss:
-        best_loss = loss_dict["loss"]
-        best_dlatent, best_dlabel= generator.get_dvariables()
+        if best_loss is None or loss_dict["loss"] < best_loss:
+            best_loss = loss_dict["loss"]
+            best_dlatent, best_dlabel= generator.get_dvariables()
     
-    generator.stochastic_clip_dvariables()
-    history.append((loss_dict["loss"], generator.get_dvariables()))
+        generator.stochastic_clip_dvariables()
+        history.append((loss_dict["loss"], generator.get_dvariables()))
     
-    if i % args.iterations_to_save == 0 and i > 0:
-        print("saving reconstruction output for iteration num {}".format(i))
-        if best_dlatent is not None and best_dlabel is not None:
-            generator.get_beautify_image(dlatents=best_dlatent,dlabels=best_dlabel, index=i,dir=result_subdir)
+        if i % args.iterations_to_save == 0 and i > 0:
+            print("saving reconstruction output for iteration num {}".format(i))
+            if best_dlatent is not None and best_dlabel is not None:
+                generator.get_beautify_image(dlatents=best_dlatent,dlabels=best_dlabel, index=i,dir=result_subsubdir)
 
-generator.get_beautify_image(dlatents=best_dlatent,dlabels=best_dlabel, index=args.iterations,dir=result_subdir)
-history.append((best_loss, best_dlatent, best_dlabel))
-print(" ".join([name]), " Loss {:.4f}".format(best_loss))
+    generator.get_beautify_image(dlatents=best_dlatent,dlabels=best_dlabel, index=args.iterations,dir=result_subsubdir)
+    history.append((best_loss, best_dlatent, best_dlabel))
+    print(" ".join([name]), " Loss {:.4f}".format(best_loss))
 
-# Generate images from found dlatents and save them
+    # Generate images from found dlatents and save them
 
-generator.set_dlatents(best_dlatent)
-generator.set_dlabels(best_dlabel)
-generated_images = generator.generate_images()
-generated_dlatents,generated_dlabels = generator.get_dvariables()
+    generator.set_dlatents(best_dlatent)
+    generator.set_dlabels(best_dlabel)
+    generated_images = generator.generate_images()
+    generated_dlatents,generated_dlabels = generator.get_dvariables()
 
-for img_array, dlatent, dlabel, img_name in zip(generated_images, generated_dlatents, generated_dlabels, [name]):
-    img = PIL.Image.fromarray(img_array, 'RGB')
-    img.save(os.path.join(args.generated_images_dir, f'{img_name}.png'), 'PNG')
-    np.save(os.path.join(args.dlatent_dir, f'{img_name}.npy'), dlatent)
-    np.save(os.path.join(args.dlabel_dir, f'{img_name}.npy'), dlabel)
+    for img_array, dlatent, dlabel, img_name in zip(generated_images, generated_dlatents, generated_dlabels, names):
+        img = PIL.Image.fromarray(img_array, 'RGB')
+        img.save(os.path.join(args.generated_images_dir, f'{img_name}.png'), 'PNG')
+        np.save(os.path.join(args.dlatent_dir, f'{img_name}.npy'), dlatent)
+        np.save(os.path.join(args.dlabel_dir, f'{img_name}.npy'), dlabel)
 
-# save history of latents
-with open(result_subdir+'/history_of_latents.txt', 'w') as f:
-    for item in history:
-        f.write("{}\n".format(item))
-        f.write("\n")
+    # save history of latents
+    with open(result_subsubdir+'/history_of_latents.txt', 'w') as f:
+        for item in history:
+            f.write("{}\n".format(item))
+            f.write("\n")
 
-generator.reset_dlatents()
-generator.reset_dlabels()
+    generator.reset_dlatents()
+    generator.reset_dlabels()
+
+    del perceptual_model
+    gc.collect()
