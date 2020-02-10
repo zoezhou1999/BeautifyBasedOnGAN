@@ -151,11 +151,11 @@ for img_name in os.listdir(args.src_dir):
 del landmarks_detector
 gc.collect()
 
-ref_images = [os.path.join(args.src_dir, x) for x in os.listdir(args.src_dir)]
+ref_images = [os.path.join(args.aligned_dir, x) for x in os.listdir(args.aligned_dir)]
 ref_images = list(filter(os.path.isfile, ref_images))
 
 if len(ref_images) == 0:
-    raise Exception('%s is empty' % args.src_dir)
+    raise Exception('%s is empty' % args.aligned_dir)
 
 #release memory
 # del beautyrater_model
