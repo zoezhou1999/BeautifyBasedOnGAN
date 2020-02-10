@@ -414,7 +414,7 @@ import pickle
 import inspect
 import numpy as np
 
-import tfutil
+# import tfutil
 import networks
 
 #----------------------------------------------------------------------------
@@ -426,6 +426,7 @@ class LegacyUnpickler(pickle.Unpickler):
         super().__init__(*args, **kwargs)
 
     def find_class(self, module, name):
+        import tfutil
         if module == 'network' and name == 'Network':
             return tfutil.Network
         return super().find_class(module, name)
@@ -498,6 +499,7 @@ def patch_theano_gan(state):
         'static_kwargs':    spec,
         'variables':        vars}
 
+import tfutil
 tfutil.network_import_handlers.append(patch_theano_gan)
 
 #----------------------------------------------------------------------------
