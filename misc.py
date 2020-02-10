@@ -423,13 +423,14 @@ import PIL.Image
 
 import config
 import dataset
-import legacy
+
 
 #----------------------------------------------------------------------------
 # Convenience wrappers for pickle that are able to load data produced by
 # older versions of the code.
 
 def load_pkl(filename):
+    import legacy
     with open(filename, 'rb') as file:
         return legacy.LegacyUnpickler(file, encoding='latin1').load()
 
