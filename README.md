@@ -159,6 +159,13 @@ To create sequences of beautificated version from a given image, we supplied `be
 
 ```
 python beautify_image.py --results_dir experiment_folder --image_path samples/jenny.png
+
+nohup python beautify_image.py --results_dir ../model_results/beholdergan-original  --image_path ../datasets/test --iters 30000 > beautify_image_test.out 2>&1 &
+
+nohup python beautify_image.py --results_dir ../model_results/beholdergan-id/first  --src_dir ../datasets/test > beautify_image_id_test_1.out 2>&1 &
+
+nohup python beautify_image.py --results_dir ../model_results/beholdergan-id/second  --src_dir ../datasets/test > beautify_image_id_test_2.out 2>&1 &
+
 ```
 
 ```
