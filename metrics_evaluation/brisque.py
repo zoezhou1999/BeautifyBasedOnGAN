@@ -23,7 +23,7 @@ with open(args.csv_name+ ".csv", mode='w') as f:
         name=name[0:name.find(".")]
         result_path=os.path.join(args.results_dir,str(name))
         result_path_image=os.path.join(result_path,str(args.final_iteration)+"_0.png")
-        print(path,name,result_path,result_path_image)
+        # print(path,name,result_path,result_path_image)
         # calculate quality score
         ori_qualityscore = test_measure_BRISQUE(path)
         res_qualityscore = test_measure_BRISQUE(result_path_image)
@@ -34,6 +34,6 @@ with open(args.csv_name+ ".csv", mode='w') as f:
 with open(args.csv_name+ ".txt", mode='w') as f:
     mean_ori_qualityscore=mean_ori_qualityscore/len(paths)
     mean_res_qualityscore=mean_res_qualityscore/len(paths)
-    f.writelines("image num: {}".format(len(paths)))
-    f.writelines("mean_ori_qualityscore: {}".format(mean_ori_qualityscore))
-    f.writelines("mean_res_qualityscore: {}".format(mean_res_qualityscore))
+    f.writelines("image num: {};\n".format(len(paths)))
+    f.writelines("mean_ori_qualityscore: {};\n".format(mean_ori_qualityscore))
+    f.writelines("mean_res_qualityscore: {};\n".format(mean_res_qualityscore))
