@@ -17,8 +17,8 @@ from . import metric_base
 # from training import misc
 import misc
 #----------------------------------------------------------------------------
-# labelsize=60 #beholdergan
-labelsize=572 #beholdergan-id
+labelsize=60 #beholdergan
+# labelsize=572 #beholdergan-id
 
 class FID(metric_base.MetricBase):
     def __init__(self, num_images, minibatch_per_gpu, **kwargs):
