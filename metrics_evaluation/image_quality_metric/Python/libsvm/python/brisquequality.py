@@ -194,14 +194,14 @@ def test_measure_BRISQUE(imgPath):
 
     return qualityscore
 
-# exit if input argument not given
-if(len(sys.argv) != 2):
-    print("Please give input argument of the image path.")
-    print("Arguments expected: <image_path>")
-    print("--------------------------------")
-    print("Exiting")
-    sys.exit(0)
+# # exit if input argument not given
+# if(len(sys.argv) != 2):
+#     print("Please give input argument of the image path.")
+#     print("Arguments expected: <image_path>")
+#     print("--------------------------------")
+#     print("Exiting")
+#     sys.exit(0)
 
-# calculate quality score
-qualityscore = test_measure_BRISQUE(sys.argv[1])
-print("Score of the given image: ", qualityscore)
+# # calculate quality score
+# qualityscore = test_measure_BRISQUE(sys.argv[1])
+# print("Score of the given image: ", qualityscore)
