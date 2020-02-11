@@ -115,7 +115,7 @@ with open(args.csv_name+ ".csv", mode='w') as f:
         name=name[0:name.find(".")]
         result_path=os.path.join(args.results_dir,str(name))
         result_path_image=os.path.join(result_path,str(args.final_iteration)+"_0.png")
-        print(path,name,result_path,result_path_image)
+        # print(path,name,result_path,result_path_image)
         # Squared l2 distance between representations
         d = getRep(path) - getRep(result_path_image)
         d_2=np.dot(d, d)
