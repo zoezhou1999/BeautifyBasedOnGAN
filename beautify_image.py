@@ -192,12 +192,13 @@ if (args.use_lpips_loss > 0.00000001):
 ff_model = None
 beautyrater_model=beautyrater.BeautyRater(args.load_vgg_beauty_rater_model)
 facenet_model=facenet.FaceNet(args.load_facenet_model)
+perceptual_model = PerceptualModel(args, perc_model=perc_model, batch_size=args.batch_size)
+perceptual_model.build_perceptual_model(generator)
 
 # Optimize (only) dlatents by minimizing perceptual loss between reference and generated images in feature space
 for batch_index, images_batch in enumerate(tqdm(split_to_batches(ref_images, args.batch_size), total=len(ref_images)//args.batch_size)):
     names = [os.path.splitext(os.path.basename(x))[0] for x in images_batch]
-    # name = os.path.splitext(os.path.basename(ref_images))[0]
-    
+
     dlatents = None
     dlabels=None
     constant_labels=None
@@ -210,8 +211,7 @@ for batch_index, images_batch in enumerate(tqdm(split_to_batches(ref_images, arg
         else:
             constant_labels = np.vstack((constant_labels,cl))
 
-    perceptual_model = PerceptualModel(args, perc_model=perc_model, batch_size=args.batch_size,constant_labels=constant_labels)
-    perceptual_model.build_perceptual_model(generator)
+    perceptual_model.set_constant_labels(constant_labels)
     perceptual_model.set_reference_images(images_batch)
 
     if (args.load_last != ''): # load previous dlatents for initialization
@@ -255,8 +255,10 @@ for batch_index, images_batch in enumerate(tqdm(split_to_batches(ref_images, arg
     best_dlatent = None
     best_dlabel=None
     history=[]
-
-    result_subsubdir=os.path.join(result_subdir,str(batch_index))
+    
+    prefix="".join(names)
+    prefix=prefix[0:prefix.find("_")]
+    result_subsubdir=os.path.join(result_subdir,prefix)
     if os.path.exists(result_subsubdir) == False:
         os.mkdir(result_subsubdir)
 
@@ -300,6 +302,3 @@ for batch_index, images_batch in enumerate(tqdm(split_to_batches(ref_images, arg
 
     generator.reset_dlatents()
     generator.reset_dlabels()
-
-    del perceptual_model
-    gc.collect()

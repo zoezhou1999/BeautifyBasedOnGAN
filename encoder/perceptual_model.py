@@ -34,7 +34,7 @@ def unpack_bz2(src_path):
     return dst_path
 
 class PerceptualModel:
-    def __init__(self, args, batch_size=1, perc_model=None, sess=None, constant_labels=None):
+    def __init__(self, args, batch_size=1, perc_model=None, sess=None):
         self.sess = tf.get_default_session() if sess is None else sess
         K.set_session(self.sess)
         self.epsilon = 0.00000001
@@ -51,7 +51,7 @@ class PerceptualModel:
         self.mask_dir = args.mask_dir
         self.load_vgg_model=args.load_vgg_model
         self.landmarks_model_path=args.landmarks_model_path
-        self.tf_constant_labels=tf.constant(constant_labels)
+        # self.tf_constant_labels=tf.constant(constant_labels)
         if (self.layer <= 0 or self.vgg_loss <= self.epsilon):
             self.vgg_loss = None
         self.pixel_loss = args.use_pixel_loss
@@ -124,8 +124,12 @@ class PerceptualModel:
         self.ref_weight = tf.get_variable('ref_weight', shape=(self.batch_size,generated_image.shape[1],
         generated_image.shape[2],generated_image.shape[3]),
                                                dtype='float32', initializer=tf.initializers.zeros())
+        self.constant_labels=tf.get_variable('constant_labels', shape=(self.batch_size,572),
+                                                dtype='float32', initializer=tf.initializers.zeros())
+        
         self.add_placeholder("ref_img")
         self.add_placeholder("ref_weight")
+        self.add_placeholder("constant_labels")
 
 
         if (self.vgg_loss is not None):
@@ -161,7 +165,7 @@ class PerceptualModel:
             self.loss += self.lpips_loss * tf.math.reduce_mean(self.compare_images(self.ref_weight * self.ref_img, self.ref_weight * generated_image))
         
         if self.beauty_score_loss is not None:
-            self.loss += self.beauty_score_loss * tf_custom_l1_loss(self.tf_constant_labels, generator.dlabel_variable)
+            self.loss += self.beauty_score_loss * tf_custom_l1_loss(self.constant_labels, generator.dlabel_variable)
         
         # + L1 penalty on dlatent weights
         # if self.l1_penalty is not None:
@@ -195,6 +199,9 @@ class PerceptualModel:
                 cv2.grabCut(im,mask,rect,bgdModel,fgdModel,5,cv2.GC_INIT_WITH_MASK)
                 mask = np.where((mask==2)|(mask==0),0,1)
             return mask
+
+    def set_constant_labels(self, constant_labels):
+        self.assign_placeholder("constant_labels", constant_labels)
 
     def set_reference_images(self, images_list):
         assert(len(images_list) != 0 and len(images_list) <= self.batch_size)
