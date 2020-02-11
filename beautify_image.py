@@ -49,6 +49,7 @@ parser.add_argument('--gpu', '-gpu', help='gpu index for the algorithm to run on
 # parser.add_argument('--image_path', '-image_path', help='full path to image', default='../datasets/ffhq_selected_128x128', type=str)
 parser.add_argument('--resolution', '-resolution', help='resolution of the generated image', default=128, type=int)
 parser.add_argument('--aligned_dir', help='Directory for storing aligned images',default="beautify_image_alighed")
+parser.add_argument('--output_size', default=128, help='The dimension of images for input to the model', type=int)
 parser.add_argument('--x_scale', default=1, help='Scaling factor for x dimension', type=float)
 parser.add_argument('--y_scale', default=1, help='Scaling factor for y dimension', type=float)
 parser.add_argument('--em_scale', default=0.1, help='Scaling factor for eye-mouth distance', type=float)
