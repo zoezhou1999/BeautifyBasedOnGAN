@@ -52,7 +52,7 @@ parser.add_argument('--dlibFacePredictor', type=str, help="Path to dlib's face p
 parser.add_argument('--networkModel', type=str, help="Path to Torch network model.",
                     default=os.path.join(openfaceModelDir, 'nn4.small2.v1.t7'))
 parser.add_argument('--imgDim', type=int,
-                    help="Default image dimension.", default=128)
+                    help="Default image dimension.", default=96)
 parser.add_argument('--verbose', action='store_true')
 
 args = parser.parse_args()
@@ -75,6 +75,7 @@ def getRep(imgPath):
     bgrImg = cv2.imread(imgPath)
     if bgrImg is None:
         raise Exception("Unable to load image: {}".format(imgPath))
+    bgrImg=cv2.resize(bgrImg,(args.imgDim,args.imgDim))
     rgbImg = cv2.cvtColor(bgrImg, cv2.COLOR_BGR2RGB)
 
     if args.verbose:
