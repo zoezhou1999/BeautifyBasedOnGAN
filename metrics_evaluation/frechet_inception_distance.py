@@ -13,7 +13,7 @@ import scipy
 import tensorflow as tf
 import dnnlib.tflib as tflib
 
-import metric_base
+from . import metric_base
 # from training import misc
 import misc
 #----------------------------------------------------------------------------
