@@ -62,7 +62,7 @@ parser.add_argument('--dlabel_dir', help='Directory for storing dlatent represen
 parser.add_argument('--data_dir', default='data', help='Directory for storing optional models')
 parser.add_argument('--mask_dir', default='masks', help='Directory for storing optional masks')
 parser.add_argument('--load_last', default='', help='Start with embeddings from directory')
-parser.add_argument('--landmarks_model_path', help='Fetch a fl model', default='./model_results/encoder/shape_predictor_68_face_landmarks.dat')
+parser.add_argument('--landmarks_model_path', help='Fetch a fl model', default='../model_results/encoder/shape_predictor_68_face_landmarks.dat')
 parser.add_argument('--batch_size', default=1, help='Batch size for generator and perceptual model', type=int)
 
 # Perceptual model params
