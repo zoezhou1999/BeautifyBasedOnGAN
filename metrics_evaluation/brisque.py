@@ -1,4 +1,4 @@
-import image_quality_metric.Python.libsvm.python.brisquequality.test_measure_BRISQUE as BRISQUE
+import image_quality_metric.Python.libsvm.python.brisquequality as BRISQUE
 import argparse
 import csv
 import os
@@ -24,8 +24,8 @@ with open(args.csv_name+ ".csv", mode='w') as f:
         result_path=os.path.join(path,str(name))
         result_path_image=os.path.join(result_path,str(args.final_iteration)+"_0.png")
         # calculate quality score
-        ori_qualityscore = BRISQUE(path)
-        res_qualityscore = BRISQUE(result_path_image)
+        ori_qualityscore = BRISQUE.test_measure_BRISQUE(path)
+        res_qualityscore = BRISQUE.test_measure_BRISQUE(result_path_image)
         mean_ori_qualityscore+=ori_qualityscore
         mean_res_qualityscore+=res_qualityscore
         writer.writerow([name, ori_qualityscore, res_qualityscore])
