@@ -62,7 +62,7 @@ parser.add_argument('--dlabel_dir', help='Directory for storing dlatent represen
 parser.add_argument('--data_dir', default='data', help='Directory for storing optional models')
 parser.add_argument('--mask_dir', default='masks', help='Directory for storing optional masks')
 parser.add_argument('--load_last', default='', help='Start with embeddings from directory')
-parser.add_argument('--landmarks_model_path', help='Fetch a fl model', default='data/shape_predictor_68_face_landmarks.dat')
+parser.add_argument('--landmarks_model_path', help='Fetch a fl model', default='./model_results/encoder/shape_predictor_68_face_landmarks.dat')
 parser.add_argument('--batch_size', default=1, help='Batch size for generator and perceptual model', type=int)
 
 # Perceptual model params
@@ -76,7 +76,7 @@ parser.add_argument('--load_effnet', default='../model_results/encoder/finetuned
 parser.add_argument('--load_resnet', default='../model_results/encoder/finetuned_resnet.h5', help='Model to load for ResNet approximation of dlatents')
 parser.add_argument('--load_perc_model', default='../model_results/encoder/vgg16_zhang_perceptual.pkl', help='Model to load for ResNet approximation of dlatents')
 parser.add_argument('--load_vgg_model', default='data/vgg16_weights_tf_dim_ordering_tf_kernels_notop.h5', help='Model to load for VGG16')
-parser.add_argument('--load_vgg_beauty_rater_model', default='../beauty_prediction/trained_model/VGG16_beauty_rates-new.pt', help='Model to load for VGG16')
+parser.add_argument('--load_vgg_beauty_rater_model', default='../Beholder-GAN-original/beauty_prediction/trained_model/VGG16_beauty_rates-new.pt', help='Model to load for VGG16')
 parser.add_argument('--load_facenet_model', default='../model_results/facenet/20180402-114759/20180402-114759.pb', help='Model to load for VGG16')
 
 # Loss function options
