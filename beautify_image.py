@@ -261,7 +261,7 @@ for batch_index, images_batch in enumerate(tqdm(split_to_batches(ref_images, arg
         os.mkdir(result_subsubdir)
 
     for i, loss_dict in enumerate(pbar):
-        pbar.set_description(" ".join([name]) + ": " + "; ".join(["{} {:.4f}".format(k, v)
+        pbar.set_description(" ".join(names) + ": " + "; ".join(["{} {:.4f}".format(k, v)
                     for k, v in loss_dict.items()]))
         if best_loss is None or loss_dict["loss"] < best_loss:
             best_loss = loss_dict["loss"]
@@ -277,7 +277,7 @@ for batch_index, images_batch in enumerate(tqdm(split_to_batches(ref_images, arg
 
     generator.get_beautify_image(dlatents=best_dlatent,dlabels=best_dlabel, index=args.iterations,dir=result_subsubdir)
     history.append((best_loss, best_dlatent, best_dlabel))
-    print(" ".join([name]), " Loss {:.4f}".format(best_loss))
+    print(" ".join(names), " Loss {:.4f}".format(best_loss))
 
     # Generate images from found dlatents and save them
 
