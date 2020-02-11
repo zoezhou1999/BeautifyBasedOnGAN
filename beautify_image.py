@@ -128,24 +128,24 @@ landmarks_detector = LandmarksDetector(args.landmarks_model_path)
 aligned_face_path=None
 ALIGNED_IMAGES_DIR = args.aligned_dir
 for img_name in os.listdir(args.src_dir):
-        print('Aligning %s ...' % img_name)
-        try:
-            raw_img_path = os.path.join(args.src_dir, img_name)
-            fn = face_img_name = '%s_%02d.png' % (os.path.splitext(img_name)[0], 1)
-            if os.path.isfile(fn):
-                continue
-            print('Getting landmarks...')
-            for i, face_landmarks in enumerate(landmarks_detector.get_landmarks(raw_img_path), start=1):
-                try:
-                    print('Starting face alignment...')
-                    face_img_name = '%s_%02d.png' % (os.path.splitext(img_name)[0], i)
-                    aligned_face_path = os.path.join(ALIGNED_IMAGES_DIR, face_img_name)
-                    image_align(raw_img_path, aligned_face_path, face_landmarks, output_size=args.output_size, x_scale=args.x_scale, y_scale=args.y_scale, em_scale=args.em_scale, alpha=args.use_alpha)
-                    print('Wrote result %s' % aligned_face_path)
-                except:
-                    print("Exception in face alignment!")
-        except:
-            print("Exception in landmark detection!")
+    print('Aligning %s ...' % img_name)
+    try:
+        raw_img_path = os.path.join(args.src_dir, img_name)
+        fn = face_img_name = '%s_%02d.png' % (os.path.splitext(img_name)[0], 1)
+        if os.path.isfile(fn):
+            continue
+        print('Getting landmarks...')
+        for i, face_landmarks in enumerate(landmarks_detector.get_landmarks(raw_img_path), start=1):
+            try:
+                print('Starting face alignment...')
+                face_img_name = '%s_%02d.png' % (os.path.splitext(img_name)[0], i)
+                aligned_face_path = os.path.join(ALIGNED_IMAGES_DIR, face_img_name)
+                image_align(raw_img_path, aligned_face_path, face_landmarks, output_size=args.output_size, x_scale=args.x_scale, y_scale=args.y_scale, em_scale=args.em_scale, alpha=args.use_alpha)
+                print('Wrote result %s' % aligned_face_path)
+            except:
+                print("Exception in face alignment!")
+    except:
+        print("Exception in landmark detection!")
 
 #release memory
 del landmarks_detector
