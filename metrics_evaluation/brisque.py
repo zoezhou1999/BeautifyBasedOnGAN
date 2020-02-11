@@ -21,7 +21,7 @@ with open(args.csv_name+ ".csv", mode='w') as f:
     for path in paths:
         name=os.path.basename(path)
         name=name[0:name.find(".")]
-        result_path=os.path.join(path,str(name))
+        result_path=os.path.join(result_path,str(name))
         result_path_image=os.path.join(result_path,str(args.final_iteration)+"_0.png")
         print(path,name,result_path,result_path_image)
         # calculate quality score
