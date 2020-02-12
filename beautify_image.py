@@ -302,3 +302,4 @@ for batch_index, images_batch in enumerate(tqdm(split_to_batches(ref_images, arg
 
     generator.reset_dlatents()
     generator.reset_dlabels()
+    gc.collect()
