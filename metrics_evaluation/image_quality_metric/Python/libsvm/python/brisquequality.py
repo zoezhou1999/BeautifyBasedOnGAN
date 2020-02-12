@@ -152,6 +152,7 @@ def test_measure_BRISQUE(imgPath):
         print("Wrong image path given")
         print("Exiting...")
         sys.exit(0)
+    dis=cv2.resize(dis,(128,128))
     # convert to gray scale
     dis = cv2.cvtColor(dis, cv2.COLOR_BGR2GRAY)
 
