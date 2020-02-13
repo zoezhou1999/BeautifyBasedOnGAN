@@ -77,7 +77,7 @@ parser.add_argument('--load_effnet', default='../model_results/encoder/finetuned
 parser.add_argument('--load_resnet', default='../model_results/encoder/finetuned_resnet.h5', help='Model to load for ResNet approximation of dlatents')
 parser.add_argument('--load_perc_model', default='../model_results/encoder/vgg16_zhang_perceptual.pkl', help='Model to load for ResNet approximation of dlatents')
 parser.add_argument('--load_vgg_model', default='data/vgg16_weights_tf_dim_ordering_tf_kernels_notop.h5', help='Model to load for VGG16')
-parser.add_argument('--load_vgg_beauty_rater_model', default='../Beholder-GAN-original/beauty_prediction/trained_model/VGG16_beauty_rates-new.pt', help='Model to load for VGG16')
+parser.add_argument('--load_vgg_beauty_rater_model', default='../Beholder-GAN-original-dump/beauty_prediction/trained_model/VGG16_beauty_rates-new.pt', help='Model to load for VGG16')
 parser.add_argument('--load_facenet_model', default='../model_results/facenet/20180402-114759/20180402-114759.pb', help='Model to load for VGG16')
 
 # Loss function options
