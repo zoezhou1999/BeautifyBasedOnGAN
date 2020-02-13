@@ -100,6 +100,9 @@ parser.add_argument('--face_mask', default=False, help='Generate a mask for pred
 parser.add_argument('--use_grabcut', default=True, help='Use grabcut algorithm on the face mask to better segment the foreground', type=bool)
 parser.add_argument('--scale_mask', default=1.5, help='Look over a wider section of foreground for grabcut', type=float)
 
+
+parser.add_argument('--use_aligned', default=1, help='align face before recovery', type=int)
+
 args = parser.parse_args()
 
 # manual parameters
@@ -125,38 +128,44 @@ tf_config['graph_options.place_pruned_graph'] = True  # False (default) = Check 
 tf_config['gpu_options.allow_growth'] = True
 tfutil.init_tf(tf_config)
 
-landmarks_detector = LandmarksDetector(args.landmarks_model_path)
-aligned_face_path=None
-ALIGNED_IMAGES_DIR = args.aligned_dir
-for img_name in os.listdir(args.src_dir):
-    print('Aligning %s ...' % img_name)
-    try:
-        raw_img_path = os.path.join(args.src_dir, img_name)
-        fn = face_img_name = '%s_%02d.png' % (os.path.splitext(img_name)[0], 1)
-        if os.path.isfile(fn):
-            continue
-        print('Getting landmarks...')
-        for i, face_landmarks in enumerate(landmarks_detector.get_landmarks(raw_img_path), start=1):
-            try:
-                print('Starting face alignment...')
-                face_img_name = '%s_%02d.png' % (os.path.splitext(img_name)[0], i)
-                aligned_face_path = os.path.join(ALIGNED_IMAGES_DIR, face_img_name)
-                image_align(raw_img_path, aligned_face_path, face_landmarks, output_size=args.output_size, x_scale=args.x_scale, y_scale=args.y_scale, em_scale=args.em_scale, alpha=args.use_alpha)
-                print('Wrote result %s' % aligned_face_path)
-            except:
-                print("Exception in face alignment!")
-    except:
-        print("Exception in landmark detection!")
+if args.use_aligned==1:
+    landmarks_detector = LandmarksDetector(args.landmarks_model_path)
+    aligned_face_path=None
+    ALIGNED_IMAGES_DIR = args.aligned_dir
+    for img_name in os.listdir(args.src_dir):
+        print('Aligning %s ...' % img_name)
+        try:
+            raw_img_path = os.path.join(args.src_dir, img_name)
+            fn = face_img_name = '%s_%02d.png' % (os.path.splitext(img_name)[0], 1)
+            if os.path.isfile(fn):
+                continue
+            print('Getting landmarks...')
+            for i, face_landmarks in enumerate(landmarks_detector.get_landmarks(raw_img_path), start=1):
+                try:
+                    print('Starting face alignment...')
+                    face_img_name = '%s_%02d.png' % (os.path.splitext(img_name)[0], i)
+                    aligned_face_path = os.path.join(ALIGNED_IMAGES_DIR, face_img_name)
+                    image_align(raw_img_path, aligned_face_path, face_landmarks, output_size=args.output_size, x_scale=args.x_scale, y_scale=args.y_scale, em_scale=args.em_scale, alpha=args.use_alpha)
+                    print('Wrote result %s' % aligned_face_path)
+                except:
+                    print("Exception in face alignment!")
+        except:
+            print("Exception in landmark detection!")
+    #release memory
+    del landmarks_detector
+    gc.collect()
 
-#release memory
-del landmarks_detector
-gc.collect()
-
-ref_images = [os.path.join(args.aligned_dir, x) for x in os.listdir(args.aligned_dir)]
-ref_images = list(filter(os.path.isfile, ref_images))
-
-if len(ref_images) == 0:
-    raise Exception('%s is empty' % args.aligned_dir)
+ref_images=None
+if args.use_aligned==1:
+    ref_images = [os.path.join(args.aligned_dir, x) for x in os.listdir(args.aligned_dir)]
+    ref_images = list(filter(os.path.isfile, ref_images))
+    if len(ref_images) == 0:
+        raise Exception('%s is empty' % args.aligned_dir)
+else:
+    ref_images = [os.path.join(args.src_dir, x) for x in os.listdir(args.src_dir)]
+    ref_images = list(filter(os.path.isfile, ref_images))
+    if len(ref_images) == 0:
+        raise Exception('%s is empty' % args.src_dir)
 
 #release memory
 # del beautyrater_model
