@@ -85,21 +85,25 @@ def getRep(imgPath):
     bb = align.getLargestFaceBoundingBox(rgbImg)
     if bb is None:
         print("Unable to find a face: {}".format(imgPath))
-        return None
     if args.verbose:
         print("  + Face detection took {} seconds.".format(time.time() - start))
 
     start = time.time()
-    alignedFace = align.align(args.imgDim, rgbImg, bb,
+    alignedFace=None
+    if bb is not None:
+        alignedFace = align.align(args.imgDim, rgbImg, bb,
                               landmarkIndices=openface.AlignDlib.OUTER_EYES_AND_NOSE)
-    if alignedFace is None:
-        print("Unable to align image: {}".format(imgPath))
-        return None
-    if args.verbose:
-        print("  + Face alignment took {} seconds.".format(time.time() - start))
+        if alignedFace is None:
+            print("Unable to align image: {}".format(imgPath))
+        if args.verbose:
+            print("  + Face alignment took {} seconds.".format(time.time() - start))
 
     start = time.time()
-    rep = net.forward(alignedFace)
+    if alignedFace is not None:
+        rep = net.forward(alignedFace)
+    else:
+        print("use original RGB image to extract feature")
+        rep = net.forward(rgbImg)
     if args.verbose:
         print("  + OpenFace forward pass took {} seconds.".format(time.time() - start))
         print("Representation:")
@@ -119,13 +123,7 @@ with open(args.csv_name+ ".csv", mode='w') as f:
         result_path_image=os.path.join(result_path,str(args.final_iteration)+"_0.png")
         # print(path,name,result_path,result_path_image)
         # Squared l2 distance between representations
-        d1=getRep(path)
-        d2=getRep(result_path_image)
-        d=None
-        if d1==None or d2==None:
-            d=1
-        else:
-            d = d1-d2
+        d = getRep(path)-getRep(result_path_image)
         d_2=np.dot(d, d)
         mean_dis+=d_2
         writer.writerow([name,d_2])
