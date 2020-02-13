@@ -49,7 +49,7 @@ for index, path in enumerate(image_paths):
     
     # manual parameters
     prefix=os.path.basename(path)
-    prefix=prefix[0:prefix.find(".")]
+    prefix=prefix[0:prefix.find("_")]
     result_subsubdir=os.path.join(result_subdir,prefix)
     if os.path.exists(result_subsubdir) == False:
         os.mkdir(result_subsubdir)
