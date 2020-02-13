@@ -140,15 +140,29 @@ if args.use_aligned==1:
             if os.path.isfile(fn):
                 continue
             print('Getting landmarks...')
-            for i, face_landmarks in enumerate(landmarks_detector.get_landmarks(raw_img_path), start=1):
-                try:
-                    print('Starting face alignment...')
-                    face_img_name = '%s_%02d.png' % (os.path.splitext(img_name)[0], i)
-                    aligned_face_path = os.path.join(ALIGNED_IMAGES_DIR, face_img_name)
-                    image_align(raw_img_path, aligned_face_path, face_landmarks, output_size=args.output_size, x_scale=args.x_scale, y_scale=args.y_scale, em_scale=args.em_scale, alpha=args.use_alpha)
-                    print('Wrote result %s' % aligned_face_path)
-                except:
-                    print("Exception in face alignment!")
+            ld=landmarks_detector.get_landmarks(raw_img_path)
+            if len(ld)==0:
+                print("Cannot get landmarks so use original image as aligned image")
+                # Load in-the-wild image.
+                if not os.path.isfile(raw_img_path):
+                    print('Cannot find source image in {}'.format(raw_img_path))
+                img = PIL.Image.open(raw_img_path)
+                # Save aligned image.
+                face_img_name = '%s_%02d.png' % (os.path.splitext(img_name)[0], 1)
+                aligned_face_path = os.path.join(ALIGNED_IMAGES_DIR, face_img_name)
+                img.save(aligned_face_path, 'PNG')
+                print('Wrote result %s' % aligned_face_path)
+            else:
+                for i, face_landmarks in enumerate(ld, start=1):
+                    try:
+                        print('Starting face alignment...')
+                        face_img_name = '%s_%02d.png' % (os.path.splitext(img_name)[0], i)
+                        aligned_face_path = os.path.join(ALIGNED_IMAGES_DIR, face_img_name)
+                        image_align(raw_img_path, aligned_face_path, face_landmarks, output_size=args.output_size, x_scale=args.x_scale, y_scale=args.y_scale, em_scale=args.em_scale, alpha=args.use_alpha)
+                        print('Wrote result %s' % aligned_face_path)
+                        break #only use first face found!
+                    except:
+                        print("Exception in face alignment!")
         except:
             print("Exception in landmark detection!")
     #release memory
