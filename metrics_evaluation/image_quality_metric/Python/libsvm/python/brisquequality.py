@@ -8,6 +8,7 @@ import os
 
 # import svm functions (from libsvm library)   
 # if python2.x version : import svm from libsvm (sudo apt-get install python-libsvm)
+sys.path.append("/root/data/BeautifyBasedOnGAN/metrics_evaluation/image_quality_metric/Python/libsvm/python")
 if sys.version_info[0] < 3:
     import svm
     import svmutil
