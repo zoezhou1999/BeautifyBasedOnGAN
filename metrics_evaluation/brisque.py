@@ -20,9 +20,15 @@ with open(args.csv_name+ ".csv", mode='w') as f:
     writer.writerow(['image_name', 'ori_qualityscore', 'res_qualityscore'])
     for path in paths:
         name=os.path.basename(path)
-        name=name[0:name.find("_")]
-        result_path=os.path.join(args.results_dir,str(name))
-        result_path_image=os.path.join(result_path,str(args.final_iteration)+"_0.png")
+        # name=name[0:name.find("_")]
+        name=name[0:name.find(".")]
+        #These for Beholder-XXXX
+        # result_path=os.path.join(args.results_dir,str(name))
+        # result_path_image=os.path.join(result_path,str(args.final_iteration)+"_0.png")
+        
+        #These for InterFaceGAN-XXXX
+        result_path_image=os.path.join(args.results_dir,name+"_0.png")
+
         # print(path,name,result_path,result_path_image)
         # calculate quality score
         ori_qualityscore = test_measure_BRISQUE(path)
