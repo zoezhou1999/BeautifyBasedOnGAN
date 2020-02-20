@@ -10,6 +10,7 @@ from scipy import misc
 from six.moves import xrange
 import cv2
 from sklearn.preprocessing import normalize
+import glob
 
 def load_pb(path_to_pb):
     with tf.io.gfile.GFile(path_to_pb, "rb") as f:
