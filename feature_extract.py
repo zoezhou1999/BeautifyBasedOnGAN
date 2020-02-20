@@ -40,8 +40,6 @@ output = graph.get_tensor_by_name('embeddings:0')
 phase_train_placeholder = graph.get_tensor_by_name("phase_train:0")
 
 id_features=[]
-images_dir = "{0}/img".format(args.dataset)
-number_of_images = len(os.listdir(images_dir))
 config = tf.compat.v1.ConfigProto(allow_soft_placement=True, log_device_placement=True)
 config.gpu_options.allow_growth = True
 
