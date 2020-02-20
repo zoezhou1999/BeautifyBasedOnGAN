@@ -6,6 +6,7 @@ import csv
 import numpy as np
 import sys
 import glob
+import pylab
 
 
 if __name__ == "__main__":
@@ -15,17 +16,17 @@ if __name__ == "__main__":
     labels1 = np.load("gender.npy")
     labels2 = np.load("eyeglasses.npy")
     Y = tsne(X, 2, 50, 20.0)
-    plt.close('all')
-    plt.ioff()
-    fig = plt.figure(figsize=(10, 10))
+    pylab.close('all')
+    pylab.ioff()
+    fig = pylab.figure(figsize=(10, 10))
     fig.clf()
-    plt.scatter(Y[:, 0], Y[:, 1], 20, labels1)
-    plt.title("FaceNet-Gender")
-    plt.savefig("FaceNet-Gender.png")
-    plt.close('all')
-    plt.ioff()
-    fig = plt.figure(figsize=(10, 10))
+    pylab.scatter(Y[:, 0], Y[:, 1], 20, labels1)
+    pylab.title("FaceNet-Gender")
+    pylab.savefig("FaceNet-Gender.png")
+    pylab.close('all')
+    pylab.ioff()
+    fig = pylab.figure(figsize=(10, 10))
     fig.clf()
-    plt.scatter(Y[:, 0], Y[:, 1], 20, labels2)
-    plt.title("FaceNet-Eyeglasses")
-    plt.savefig("FaceNet-Eyeglasses.png")
+    pylab.scatter(Y[:, 0], Y[:, 1], 20, labels2)
+    pylab.title("FaceNet-Eyeglasses")
+    pylab.savefig("FaceNet-Eyeglasses.png")
