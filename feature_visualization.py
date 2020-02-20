@@ -1,20 +1,12 @@
 from tsne import tsne
 import numpy as np
-import pylab
 import matplotlib.pyplot as plt
-import seaborn as sns
-from itertools import cycle
 import os
 import csv
 import numpy as np
-from mpl_toolkits.mplot3d import Axes3D
-import argparse
 import sys
 import glob
-import collections
-from matplotlib.image import NonUniformImage
-import matplotlib._color_data as mcd
-import matplotlib.patches as mpatch
+
 
 if __name__ == "__main__":
     print("Run Y = tsne.tsne(X, no_dims, perplexity) to perform t-SNE on your dataset.")
