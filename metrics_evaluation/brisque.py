@@ -29,7 +29,7 @@ with open(args.csv_name+ ".csv", mode='w') as f:
         #These for InterFaceGAN-XXXX
         # result_path_image=os.path.join(args.results_dir,name+"_0.png")
 
-        # print(path,name,result_path,result_path_image)
+        print(path,name,result_path,result_path_image)
         # calculate quality score
         ori_qualityscore = test_measure_BRISQUE(path)
         res_qualityscore = test_measure_BRISQUE(result_path_image)
