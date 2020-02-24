@@ -65,9 +65,7 @@ class PerceptualModel:
             self.lpips_loss = None
         if (self.beauty_score_loss <= self.epsilon):
             self.beauty_score_loss = None
-        # self.l1_penalty = args.use_l1_penalty
-        # if (self.l1_penalty <= self.epsilon):
-        #     self.l1_penalty = None
+
         self.batch_size = batch_size
         if perc_model is not None and self.lpips_loss is not None:
             self.perc_model = perc_model
@@ -115,8 +113,6 @@ class PerceptualModel:
         generated_image = tf.image.resize_nearest_neighbor(generated_image_tensor,
                                                                   (self.img_size, self.img_size), align_corners=True)
         
-        # print("print(generator.generator_output_shape)",generator.generator_output_shape)
-
         self.ref_img = tf.get_variable('ref_img', shape=(self.batch_size,generated_image.shape[1],
         generated_image.shape[2],generated_image.shape[3]),
                                                 dtype='float32', initializer=tf.initializers.zeros())
@@ -128,9 +124,7 @@ class PerceptualModel:
 
 
         if (self.vgg_loss is not None):
-            # Local_VGG16=load_model(self.load_vgg_model)
             vgg16 = VGG16(include_top=False, input_shape=(self.img_size, self.img_size, 3))
-            # vgg16 = Local_VGG16(include_top=False, input_shape=(self.img_size, self.img_size, 3))
             self.perceptual_model = Model(vgg16.input, vgg16.layers[self.layer].output)
             generated_img_features = self.perceptual_model(preprocess_input(self.ref_weight * generated_image))
             print("generated_img_features.shape",generated_img_features.shape)
@@ -162,10 +156,6 @@ class PerceptualModel:
         if self.beauty_score_loss is not None:
             self.loss += self.beauty_score_loss * tf_custom_l1_loss(self.tf_constant_labels, generator.dlabel_variable)
         
-        # + L1 penalty on dlatent weights
-        # if self.l1_penalty is not None:
-        #     self.loss += self.l1_penalty * 512 * tf.math.reduce_mean(tf.math.abs(generator.dlatent_variable-generator.get_dlatent_avg()))
-
     def generate_face_mask(self, im):
         from imutils import face_utils
         import cv2
