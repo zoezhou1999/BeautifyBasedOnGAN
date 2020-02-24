@@ -120,7 +120,7 @@ class PerceptualModel:
         self.ref_weight = tf.get_variable('ref_weight', shape=(self.batch_size,generated_image.shape[1],
         generated_image.shape[2],generated_image.shape[3]),
                                                dtype='float32', initializer=tf.initializers.zeros())
-        self.constant_labels=tf.get_variable('constant_labels', shape=(self.batch_size,572),
+        self.constant_labels=tf.get_variable('constant_labels', shape=(self.batch_size,60),
                                                 dtype='float32', initializer=tf.initializers.zeros())
         
         self.add_placeholder("ref_img")
