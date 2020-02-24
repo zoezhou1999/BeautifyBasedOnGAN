@@ -75,8 +75,8 @@ def main():
     # Which networks to evaluate them on?
     tasks = []
     # tasks += [EasyDict(run_func_name='run_metrics.run_pickle', network_pkl='../model_results/stylegan/karras2019stylegan-ffhq-1024x1024.pkl', dataset_args=EasyDict(tfrecord_dir='ffhq', shuffle_mb=0), mirror_augment=True)] # karras2019stylegan-ffhq-1024x1024.pkl
-    tasks += [EasyDict(run_func_name='run_metrics.run_pickle', network_pkl='../model_results/beholdergan-original/network-final.pkl', dataset_args=EasyDict(tfrecord_dir='ffhq_128x128_tf', shuffle_mb=0), mirror_augment=True)] # beholdergan
-    # tasks += [EasyDict(run_func_name='run_metrics.run_pickle', network_pkl='../model_results/beholdergan-id/second/network-final.pkl', dataset_args=EasyDict(tfrecord_dir='ffhq_128x128_id_tf', shuffle_mb=0), mirror_augment=True)] # beholdergan-id
+    #tasks += [EasyDict(run_func_name='run_metrics.run_pickle', network_pkl='../model_results/beholdergan-original/network-final.pkl', dataset_args=EasyDict(tfrecord_dir='ffhq_128x128_tf', shuffle_mb=0), mirror_augment=True)] # beholdergan
+    tasks += [EasyDict(run_func_name='run_metrics.run_pickle', network_pkl='../model_results/beholdergan-id/first/network-final.pkl', dataset_args=EasyDict(tfrecord_dir='ffhq_128x128_id_tf', shuffle_mb=0), mirror_augment=True)] # beholdergan-id
     # tasks += [EasyDict(run_func_name='run_metrics.run_pickle', network_pkl='../model_results/beholdergan-id/second/network-final.pkl', dataset_args=EasyDict(tfrecord_dir='ffhq_128x128_id_tf', shuffle_mb=0), mirror_augment=True)] # beholdergan-id
     
     #tasks += [EasyDict(run_func_name='run_metrics.run_snapshot', run_id=100, snapshot=25000)]
