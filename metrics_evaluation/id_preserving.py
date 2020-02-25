@@ -123,7 +123,8 @@ with open(args.csv_name+ ".csv", mode='w') as f:
 
         #These for Beholder-XXXX
         result_path=os.path.join(args.results_dir,str(name))
-        result_path_image=os.path.join(result_path,str(args.final_iteration)+"_0.png")
+        # result_path_image=os.path.join(result_path,str(args.final_iteration)+"_0.png")
+        result_path_image=os.path.join(result_path,"%04d-0.png" % args.final_iteration)
         
         #These for InterFaceGAN-XXXX
         # result_path_image=os.path.join(args.results_dir,name+"_0.png")
