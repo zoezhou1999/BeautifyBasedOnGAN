@@ -1,0 +1,5 @@
+Collecting opencv-python
+  Downloading https://files.pythonhosted.org/packages/6a/a8/f051a1ec9a08312d76a5b8b663d831c91de24ec80a073a3303a1617aaef1/opencv_python-4.1.1.26-cp37-cp37m-macosx_10_8_x86_64.macosx_10_9_intel.macosx_10_9_x86_64.macosx_10_10_intel.macosx_10_10_x86_64.whl (51.6MB)
+Requirement already satisfied: numpy>=1.14.5 in /usr/local/lib/python3.7/site-packages (from opencv-python) (1.16.4)
+Installing collected packages: opencv-python
+Successfully installed opencv-python-4.1.1.26
