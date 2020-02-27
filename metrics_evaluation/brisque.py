@@ -24,8 +24,13 @@ with open(args.csv_name+ ".csv", mode='w') as f:
         # name=name[0:name.find(".")]
         #These for Beholder-XXXX
         result_path=os.path.join(args.results_dir,str(name))
+<<<<<<< HEAD
         # result_path_image=os.path.join(result_path,str(args.final_iteration)+"_0.png")
         result_path_image=os.path.join(result_path,"%04d-0.png" % args.final_iteration)
+=======
+        result_path_image=os.path.join(result_path,str(args.final_iteration)+"_0.png")
+        # result_path_image=os.path.join(result_path,"%04d-0.png" % args.final_iteration)
+>>>>>>> 744cd14326e7ea833d74f1a007f1b688c3a786e2
         
         #These for InterFaceGAN-XXXX
         # result_path_image=os.path.join(args.results_dir,name+"_0.png")
