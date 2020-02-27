@@ -111,3 +111,5 @@ data/
 *.png
 *.out
 results/
+cache/
+
