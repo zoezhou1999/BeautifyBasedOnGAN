@@ -56,13 +56,18 @@ class FID(metric_base.MetricBase):
                 inception_clone = inception.clone()
                 latents = tf.random_normal([self.minibatch_per_gpu] + Gs_clone.input_shape[1:])
                 # beholdergan-id
-                labels = misc.make_rand_labels(self.minibatch_per_gpu,dims=labelsize)
-                labels = tf.constant(labels)
+                # labels = misc.make_rand_labels(self.minibatch_per_gpu,dims=labelsize)
+                # labels = tf.constant(labels)
                 
                 # beholdergan
                 # labels = tf.constant(np.zeros([self.minibatch_per_gpu, labelsize], dtype=np.float32))
+                
+                #stylegan
+                images = Gs_clone.get_output_for(latents)
 
-                images = Gs_clone.get_output_for(latents, labels)
+                # CGANs
+                # images = Gs_clone.get_output_for(latents, labels)
+                
                 images = tflib.convert_images_to_uint8(images)
                 result_expr.append(inception_clone.get_output_for(images))
 
