@@ -1,0 +1,3 @@
+image num: 400;
+mean_ori_qualityscore: 17.221051952444885;
+mean_res_qualityscore: 22.541161823635097;
