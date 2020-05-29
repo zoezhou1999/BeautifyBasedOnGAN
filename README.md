@@ -7,13 +7,10 @@ This is the code repository for our manuscript: [https://arxiv.org/abs/1902.0259
 ![beautification_samples](docs/beautification_samples.png)  
 *Beautification of real faces. Left column are the input real faces. To the right are the beautified images with an increasing beauty level.*  
   
-Our generating procedure is heavily based on the implementation of progressive growing of GANs. For more information, please refer to the original implementation:  
-[https://github.com/tkarras/progressive_growing_of_gans](https://github.com/tkarras/progressive_growing_of_gans)  
-  
   
 ## Installation  
   
-We recommend using Anaconda for python and creating a virtual environment the same way we did.  
+We recommend using Anaconda/miniconda for python and creating a virtual environment the same way we did.  
 Anaconda can be downloaded from here: [https://www.anaconda.com/distribution/](https://www.anaconda.com/distribution/)  
 
 Create environment for Python 3.6:  
@@ -29,8 +26,6 @@ conda activate beholder
 pip install -r requirements-pip.txt
 ```
 
-I used miniconda.
-
 Installation Insturction (You do not need to run these if you use the same environment as mine)
 
 ```
@@ -45,10 +40,8 @@ conda install XXXX
 ## Datasets  
   
 The datasets we worked on can be found in these links:  
-* CelebA-HQ: [CelebA](http://mmlab.ie.cuhk.edu.hk/projects/CelebA.html), [deltas](https://drive.google.com/drive/folders/0B4qLcYyJmiz0TXY1NG02bzZVRGs).  
-* SCUT-FBP-5500: [dataset](https://github.com/HCIILAB/SCUT-FBP5500-Database-Release).  
-  
-## Usage  
+* FFHQ: [FFHQ](https://github.com/NVlabs/ffhq-dataset)  
+
   
 ### Creation of Beauty Scores  
   
@@ -301,9 +294,6 @@ This will train an algorithm to restore the given image, and beautify it.
   
 We provide a pretrained model to compute the loss from VGG's extracted features: [models](https://drive.google.com/open?id=1JjILX0echkgxOZSHO3h6xuDpvN-FKD-m). 
 
-## Acknowledgments  
-The research was funded by ERC StG RAPID.  
-  
 ## Citation  
 If our work helped you in your research, please consider cite us.  
 ```
