@@ -1,13 +1,8 @@
-# Beholder-GAN: Generation and Beautification of Facial Images with Conditioning on Their Beauty Level  
+# GAN-Based Facial Attractiveness Enhancement 
 
-This is the code repository for our paper: [https://arxiv.org/abs/1902.02593](https://arxiv.org/abs/1902.02593)  
+This is the code repository for our manuscript: [https://arxiv.org/abs/1902.02593](https://arxiv.org/abs/1902.02593)  
   
-### Faces Generation Conditioned On Beauty  
-  
-![samples](docs/samples.png)  
-*Generated faces. left to right - least attractive to most attractive.*  
-  
-### Beautification Of Real Faces  
+### Beautification Results
   
 ![beautification_samples](docs/beautification_samples.png)  
 *Beautification of real faces. Left column are the input real faces. To the right are the beautified images with an increasing beauty level.*  

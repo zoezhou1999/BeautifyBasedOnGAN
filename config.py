@@ -422,7 +422,7 @@ class EasyDict(dict):
 #----------------------------------------------------------------------------
 # Paths.
 
-data_dir = '../datasets/ffhq_128x128'
+data_dir = '/home/hxz/GraduationProject/BeautifyBasedOnGAN/datasets/ffhq128x128'
 result_dir = 'results'
 cache_dir = 'cache'
 run_dir_ignore = ['results', 'datasets', 'cache']

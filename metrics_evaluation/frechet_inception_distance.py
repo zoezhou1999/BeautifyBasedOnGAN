@@ -17,8 +17,8 @@ from . import metric_base
 # from training import misc
 import misc
 #----------------------------------------------------------------------------
-# labelsize=60 #beholdergan
-labelsize=572 #beholdergan-id
+labelsize=60 #beholdergan
+# labelsize=572 #beholdergan-id
 
 class FID(metric_base.MetricBase):
     def __init__(self, num_images, minibatch_per_gpu, **kwargs):
@@ -28,7 +28,7 @@ class FID(metric_base.MetricBase):
 
     def _evaluate(self, Gs, num_gpus):
         minibatch_size = num_gpus * self.minibatch_per_gpu
-        inception = misc.load_pkl('../model_results/evaluation/inception_v3_features.pkl') # inception_v3_features.pkl
+        inception = misc.load_pkl('./inception_v3_features.pkl') # inception_v3_features.pkl
         activations = np.empty([self.num_images, inception.output_shape[1]], dtype=np.float32)
 
         # Calculate statistics for reals.
@@ -60,10 +60,10 @@ class FID(metric_base.MetricBase):
                 # labels = tf.constant(labels)
                 
                 # beholdergan
-                # labels = tf.constant(np.zeros([self.minibatch_per_gpu, labelsize], dtype=np.float32))
+                labels = tf.constant(np.zeros([self.minibatch_per_gpu, labelsize], dtype=np.float32))
                 
                 #stylegan
-                images = Gs_clone.get_output_for(latents)
+                # images = Gs_clone.get_output_for(latents)
 
                 # CGANs
                 # images = Gs_clone.get_output_for(latents, labels)

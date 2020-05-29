@@ -33,6 +33,8 @@ import numpy as np
 np.set_printoptions(precision=2)
 
 import openface
+import sys
+sys.path.append("/Users/zhouyuhongze/torch/install/bin/th")
 
 fileDir = os.path.dirname(os.path.realpath(__file__))
 modelDir = os.path.join(fileDir, 'openface/models')
@@ -118,20 +120,20 @@ with open(args.csv_name+ ".csv", mode='w') as f:
     writer.writerow(['image_name', 'squared l2 distance'])
     for path in paths:
         name=os.path.basename(path)
-        name=name[0:name.find("_")]
-        # name=name[0:name.find(".")]
+        # name=name[0:name.find("_")]
+        name=name[0:name.find(".")]
 
         #These for Beholder-XXXX
-        # result_path=os.path.join(args.results_dir,str(name))
+        result_path=os.path.join(args.results_dir,str(name))
 
         # result_path_image=os.path.join(result_path,str(args.final_iteration)+"_0.png")
-        #result_path_image=os.path.join(result_path,"%04d-0.png" % args.final_iteration)
+        result_path_image=os.path.join(result_path,"{}_0.png".format(args.final_iteration))
 
         #These for InterFaceGAN-XXXX
-        result_path_image=os.path.join(args.results_dir,name+"_0.png")
-        print(path,name,result_path_image)
+        # result_path_image=os.path.join(args.results_dir,name+"_0.png")
+        # print(path,name,result_path_image)
 
-        # print(path,name,result_path,result_path_image)
+        print(path,name,result_path,result_path_image)
         # Squared l2 distance between representations
         d = getRep(path)-getRep(result_path_image)
         d_2=np.dot(d, d)
