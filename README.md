@@ -1,6 +1,6 @@
 # GAN-Based Facial Attractiveness Enhancement 
 
-This is the code repository for our manuscript:
+This is the code repository for our manuscript: [https://arxiv.org/abs/2006.02766](https://arxiv.org/abs/2006.02766)
 
 ## README, cleared code and models will be coming soon.
 Stay tuned.
