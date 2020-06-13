@@ -17,7 +17,7 @@ This repo contains modified Beholder-GAN, evaluation part and some should-be-cle
 
 Here is our pretrained model for modified Beholder-GAN. [beholder-id.pkl](https://drive.google.com/file/d/1rUZ2bmXl0Re952l4QwO1s4cJjn3kKJ4C/view?usp=sharing)
 
-For the model of Beholder-GAN, we trained the model using FFHQ instead of CelebHQ and due to limited training information Beholder-GAN paper provided, we changed mini batch size and set the resolution to 128x128 to fit our then machine with everything else untouched. Unfortunately, we cannot reproduce the same performance as Beholder-GAN paper.
+For the model of Beholder-GAN, we trained the model using FFHQ instead of CelebA-HQ and due to limited training information Beholder-GAN paper provided, we changed mini batch size and set the resolution to 128x128 to fit our then machine with everything else untouched. Unfortunately, we cannot reproduce the same performance as Beholder-GAN paper.
 
 ## Datasets  
   
